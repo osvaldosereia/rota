@@ -1785,6 +1785,13 @@ const CLIENTES_DB = [
     "complemento": "Rua 8 jardim botânico casa sem número"
   },
   {
+  "id": "1765201111707-18ZGX",
+  "nome": "cox76",
+  "celular": "65992487079",
+  "endereco": "cox76",
+  "complemento": "RUA FRANÇA, Q16, C23, RECANTO DO SOL"
+},
+  {
     "id": "1747481668715-AbC9O",
     "nome": "COX0411 COXIPO RES COXIPO",
     "celular": "5565998446601",
@@ -3401,6 +3408,13 @@ const CLIENTES_DB = [
     "endereco": "E0413",
     "complemento": "Rua Nova olimpia 344 santa isabel Cuiabá  meu nome Ideni"
   },
+      {
+  "id": "1765201314153-GIYQS",
+  "nome": "VG9220 MAPIM",
+  "celular": "981181677",
+  "endereco": "VG9220",
+  "complemento": "RUA CHIRLI, Q2 ,LOTE 1, RESID CABO MICHEL, VG"
+},
   {
     "id": "1745587856661-AbC9O",
     "nome": "E0729 VG MANGA",
