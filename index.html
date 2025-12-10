@@ -20,7 +20,7 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a' }
+                        brand: { 50: '#f8fafc', 100: '#f1f5f9', 500: '#64748b', 600: '#475569', 700: '#334155', 900: '#0f172a' }
                     }
                 }
             }
@@ -29,106 +29,99 @@
 
     <style>
         /* Otimizações Mobile */
-        body { -webkit-tap-highlight-color: transparent; background-color: #f3f4f6; }
+        body { -webkit-tap-highlight-color: transparent; background-color: #f1f5f9; }
         
         /* Scrollbar personalizada */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* Animações */
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Toast Notification */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-left: 4px solid #3b82f6; display: flex; align-items: center; animation: slideIn 0.3s ease; max-width: 90vw; }
+        .toast { background: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-left: 4px solid #3b82f6; display: flex; align-items: center; animation: slideIn 0.3s ease; max-width: 90vw; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-        /* Badges e Status */
-        .status-badge { font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.05em; }
         
         /* Modal Transitions */
         .modal-backdrop { transition: opacity 0.3s ease; }
         .modal-content { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* Dropdown Customizado */
+        .custom-dropdown-list {
+            max-height: 250px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
     </style>
 </head>
-<body class="text-gray-800 antialiased pb-24">
+<body class="text-slate-800 antialiased pb-24">
 
     <!-- Toast Container -->
     <div id="toast-container"></div>
 
     <!-- Header Fixo -->
-    <header class="bg-white shadow-sm sticky top-0 z-30">
+    <header class="bg-white shadow-sm sticky top-0 z-30 border-b border-slate-200">
         <div class="container mx-auto max-w-5xl px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="bg-brand-600 text-white p-2 rounded-lg shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" /></svg>
+            <div class="flex items-center gap-3">
+                <div class="bg-slate-800 text-white p-2 rounded-lg shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" /></svg>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold text-gray-900 leading-tight">Rota Dona Antonia</h1>
-                    <p class="text-xs text-gray-500" id="header-date">Carregando...</p>
+                    <h1 class="text-lg font-bold text-slate-800 leading-tight">Rota Dona Antonia</h1>
+                    <p class="text-xs text-slate-500" id="header-date">Carregando...</p>
                 </div>
             </div>
             
             <div class="flex gap-2">
-                <button onclick="App.ui.toggleMenu()" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
+                <button onclick="App.ui.toggleMenu()" class="p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
                 </button>
             </div>
         </div>
         
         <!-- Menu Dropdown -->
-        <div id="main-menu" class="hidden absolute right-4 top-16 bg-white rounded-xl shadow-xl border border-gray-100 w-48 overflow-hidden z-50">
-            <button onclick="App.controllers.novaRota()" class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600">
+        <div id="main-menu" class="hidden absolute right-4 top-16 bg-white rounded-xl shadow-xl border border-slate-100 w-56 overflow-hidden z-50 ring-1 ring-black ring-opacity-5">
+            <button onclick="App.controllers.novaRota()" class="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 flex items-center gap-3 text-red-600 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 Nova Rota (Reset)
             </button>
-            
-            <div class="border-t border-gray-100"></div>
-            
-            <button onclick="App.ui.modalRelatorio.open()" class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center gap-2 text-green-600 font-medium">
+            <div class="border-t border-slate-100"></div>
+            <button onclick="App.ui.modalRelatorio.open()" class="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 flex items-center gap-3 text-green-600 font-medium transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                 Relatório Cestas (Zap)
             </button>
-
-            <div class="border-t border-gray-100"></div>
-            
-            <button onclick="App.ui.modalExport.open()" class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center gap-2 text-gray-700">
+            <div class="border-t border-slate-100"></div>
+            <button onclick="App.ui.modalExport.open()" class="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 flex items-center gap-3 text-slate-700 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 Exportar Backup
             </button>
-            <button onclick="document.getElementById('input-carregar-arquivo').click()" class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center gap-2 text-gray-700">
+            <button onclick="document.getElementById('input-carregar-arquivo').click()" class="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 flex items-center gap-3 text-slate-700 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                 Carregar Backup
             </button>
         </div>
     </header>
 
-    <main class="container mx-auto max-w-5xl px-4 py-6">
+    <main class="container mx-auto max-w-2xl px-4 py-6">
         
         <!-- KPIs / Placar -->
-        <div class="w-full mb-6" id="kpi-container">
-            <!-- Injetado via JS -->
-        </div>
+        <div class="w-full mb-6" id="kpi-container"></div>
 
         <!-- Filtros de Região -->
-        <div class="flex gap-2 overflow-x-auto pb-2 mb-4 no-scrollbar" id="filtros-regiao">
-            <!-- Injetado via JS -->
-        </div>
+        <div class="flex gap-2 overflow-x-auto pb-2 mb-4 no-scrollbar" id="filtros-regiao"></div>
 
         <!-- Botão Flutuante (FAB) para Lançamento -->
-        <button onclick="App.ui.modalLancamento.open()" class="fixed bottom-6 right-6 bg-brand-600 text-white rounded-full p-4 shadow-lg hover:bg-brand-700 transition-transform hover:scale-105 z-40 flex items-center justify-center">
+        <button onclick="App.ui.modalLancamento.open()" class="fixed bottom-6 right-6 bg-slate-800 text-white rounded-full p-4 shadow-xl hover:bg-slate-900 transition-transform hover:scale-105 z-40 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
         </button>
 
         <!-- Lista de Entregas -->
-        <div id="lista-entregas" class="space-y-4 min-h-[200px]">
-            <!-- Injetado via JS -->
-        </div>
+        <div id="lista-entregas" class="space-y-4 min-h-[200px]"></div>
         
-        <div id="lista-vazia" class="hidden flex-col items-center justify-center py-12 text-gray-400">
+        <div id="lista-vazia" class="hidden flex-col items-center justify-center py-12 text-slate-400">
             <svg class="w-16 h-16 mb-4 opacity-20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 001-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" /></svg>
             <p>Nenhuma entrega nesta região.</p>
         </div>
@@ -140,21 +133,24 @@
     <!-- Modal Lançamento -->
     <div id="modal-lancamento" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/60 modal-backdrop transition-opacity" onclick="App.ui.modalLancamento.close()"></div>
-        <!-- CORREÇÃO DE SCROLL E POSICIONAMENTO AQUI -->
         <div class="absolute bottom-0 w-full h-[90vh] flex flex-col bg-white rounded-t-2xl shadow-2xl md:fixed md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl md:h-auto md:max-h-[90vh] md:rounded-xl modal-content">
             
-            <div class="flex-none flex justify-between items-center p-4 border-b">
-                <h3 class="text-lg font-bold text-gray-800">Nova Entrega</h3>
-                <button onclick="App.ui.modalLancamento.close()" class="text-gray-400 hover:text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            <div class="flex-none flex justify-between items-center p-4 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-800">Nova Entrega</h3>
+                <button onclick="App.ui.modalLancamento.close()" class="text-slate-400 hover:text-slate-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
 
             <div class="overflow-y-auto p-4 flex-1 space-y-5">
-                <!-- Cliente -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
-                    <input type="text" id="input-cliente" list="lista-clientes-datalist" class="w-full rounded-lg border-gray-300 border p-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all" placeholder="Buscar cliente..." autocomplete="off">
-                    <datalist id="lista-clientes-datalist"></datalist>
+                <!-- Seletor de Cliente Customizado -->
+                <div class="relative group">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Cliente</label>
+                    <input type="text" id="input-cliente" class="w-full rounded-lg border-slate-300 border p-3 focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all bg-slate-50" placeholder="Digite o nome para buscar..." autocomplete="off">
                     
+                    <!-- Dropdown de Sugestões -->
+                    <div id="dropdown-clientes" class="hidden absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl custom-dropdown-list">
+                        <!-- Lista preenchida via JS -->
+                    </div>
+
                     <div id="info-cliente-preview" class="hidden mt-2 text-sm bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-100">
                         <!-- Preenchido via JS -->
                     </div>
@@ -162,29 +158,33 @@
 
                 <!-- Região -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Região <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Região <span class="text-red-500">*</span></label>
                     <div class="grid grid-cols-4 gap-2 text-sm" id="container-radio-regiao">
                         <!-- Gerado via JS -->
                     </div>
                 </div>
 
                 <!-- Adicionar Cestas -->
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    <label class="block text-sm font-bold text-gray-700 mb-3">Montar Pedido</label>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <label class="block text-sm font-bold text-slate-700 mb-3">Montar Pedido</label>
                     
                     <div class="flex gap-2 mb-3">
-                        <select id="select-cesta" class="flex-1 rounded-lg border-gray-300 border p-2 text-sm">
-                            <option value="ESPECIAL" data-valor="000.00">ESPECIAL</option>
-                            <option value="Mini Bonini" data-valor="165.00">Mini Bonini</option>
-                            <option value="Mini Koblenz" data-valor="170.00">Mini Koblenz</option>
-                            <option value="Pequena Bonini" data-valor="215.00">Pequena Bonini</option>
-                            <option value="Pequena Koblenz" data-valor="220.00">Pequena Koblenz</option>
-                            <option value="Média Bonini" data-valor="320.00">Média Bonini</option>
-                            <option value="Média Koblenz" data-valor="325.00">Média Koblenz</option>
-                            <option value="Grande Bonini" data-valor="380.00">Grande Bonini</option>
-                            <option value="Grande Koblenz" data-valor="390.00">Grande Koblenz</option>
-                        </select>
-                        <input type="number" id="qtd-cesta" value="1" min="1" class="w-16 text-center rounded-lg border-gray-300 border p-2">
+                        <!-- Seletor Customizado de Cesta -->
+                        <div class="relative flex-1" id="container-custom-select-cesta">
+                            <button type="button" id="btn-custom-select-cesta" class="w-full text-left rounded-lg border-slate-300 border p-2 text-sm bg-white flex justify-between items-center focus:ring-2 focus:ring-slate-500">
+                                <span id="label-select-cesta">Selecione a Cesta...</span>
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <!-- Dropdown Cestas -->
+                            <div id="dropdown-cestas" class="hidden absolute z-40 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl custom-dropdown-list">
+                                <!-- Opções via JS -->
+                            </div>
+                            <!-- Inputs Ocultos para valor -->
+                            <input type="hidden" id="hidden-cesta-nome" value="">
+                            <input type="hidden" id="hidden-cesta-valor" value="0">
+                        </div>
+
+                        <input type="number" id="qtd-cesta" value="1" min="1" class="w-16 text-center rounded-lg border-slate-300 border p-2 bg-white">
                     </div>
 
                     <!-- Opções Avançadas (Toggle) -->
@@ -192,27 +192,32 @@
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="check-alterada" class="sr-only peer">
                             <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
-                            <span class="ms-3 text-sm font-medium text-gray-700">Cesta Alterada?</span>
+                            <span class="ms-3 text-sm font-medium text-slate-700">Cesta Alterada?</span>
                         </label>
                     </div>
 
+                    <!-- CAMPOS TIRAR / PÔR -->
                     <div id="box-detalhes-alterada" class="hidden space-y-2 mb-3 bg-amber-50 p-3 rounded border border-amber-200">
-                        <textarea id="txt-alteracao" placeholder="Ex: TIRA Arroz, PÕE Café..." class="w-full text-sm p-2 rounded border border-amber-200"></textarea>
-                        <div class="flex gap-2">
-                            <label class="flex items-center text-xs"><input type="checkbox" class="mr-1" value="Arroz" name="partes_alt">Arroz</label>
-                            <label class="flex items-center text-xs"><input type="checkbox" class="mr-1" value="Alimento" name="partes_alt">Alimento</label>
-                            <label class="flex items-center text-xs"><input type="checkbox" class="mr-1" value="Limpeza" name="partes_alt">Limpeza</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-xs font-bold text-red-600 block mb-1">TIRAR:</label>
+                                <input type="text" id="input-tirar" placeholder="Ex: Arroz" class="w-full text-sm p-2 rounded border border-amber-200 focus:border-red-400 focus:ring-1 focus:ring-red-400 outline-none bg-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-green-600 block mb-1">PÔR:</label>
+                                <input type="text" id="input-por" placeholder="Ex: Café" class="w-full text-sm p-2 rounded border border-amber-200 focus:border-green-400 focus:ring-1 focus:ring-green-400 outline-none bg-white">
+                            </div>
                         </div>
                     </div>
                     
                     <div class="flex flex-wrap gap-2 mb-3">
-                        <span class="text-xs font-semibold text-gray-500 uppercase">Brindes:</span>
-                        <label class="flex items-center text-xs bg-white px-2 py-1 rounded border"><input type="checkbox" class="mr-1" value="Ovo" name="brindes">Ovo</label>
-                        <label class="flex items-center text-xs bg-white px-2 py-1 rounded border"><input type="checkbox" class="mr-1" value="Amaciante" name="brindes">Amaciante</label>
-                        <label class="flex items-center text-xs bg-white px-2 py-1 rounded border"><input type="checkbox" class="mr-1" value="Cafe 250g" name="brindes">Café</label>
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Brindes:</span>
+                        <label class="flex items-center text-xs bg-white px-2 py-1 rounded border border-slate-200"><input type="checkbox" class="mr-1" value="Ovo" name="brindes">Ovo</label>
+                        <label class="flex items-center text-xs bg-white px-2 py-1 rounded border border-slate-200"><input type="checkbox" class="mr-1" value="Amaciante" name="brindes">Amaciante</label>
+                        <label class="flex items-center text-xs bg-white px-2 py-1 rounded border border-slate-200"><input type="checkbox" class="mr-1" value="Cafe 250g" name="brindes">Café</label>
                     </div>
 
-                    <button onclick="App.controllers.adicionarItemAoCarrinho()" class="w-full bg-gray-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-900 flex items-center justify-center gap-2">
+                    <button onclick="App.controllers.adicionarItemAoCarrinho()" class="w-full bg-slate-800 text-white py-2 rounded-lg text-sm font-medium hover:bg-slate-900 flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                         Adicionar ao Carrinho
                     </button>
@@ -224,22 +229,22 @@
                 </div>
                 
                 <div>
-                     <label class="block text-sm font-medium text-gray-700">Obs Geral</label>
-                     <input type="text" id="input-obs-geral" class="w-full mt-1 border-gray-300 rounded-lg p-2 border" placeholder="Casa portão azul...">
+                     <label class="block text-sm font-medium text-slate-700">Obs Geral</label>
+                     <input type="text" id="input-obs-geral" class="w-full mt-1 border-slate-300 rounded-lg p-2 border bg-slate-50" placeholder="Casa portão azul...">
                 </div>
 
-                <div class="flex justify-between items-center pt-2 border-t">
-                    <span class="text-gray-600">Total Previsto:</span>
+                <div class="flex justify-between items-center pt-2 border-t border-slate-100">
+                    <span class="text-slate-600">Total Previsto:</span>
                     <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-400">R$</span>
-                        <input type="number" id="input-valor-final" step="0.01" class="text-xl font-bold text-gray-900 w-28 text-right bg-transparent border-none focus:ring-0 p-0" placeholder="0.00">
+                        <span class="text-xs text-slate-400">R$</span>
+                        <input type="number" id="input-valor-final" step="0.01" class="text-xl font-bold text-slate-900 w-28 text-right bg-transparent border-none focus:ring-0 p-0" placeholder="0.00">
                     </div>
                 </div>
             </div>
 
-            <div class="flex-none p-4 border-t bg-gray-50 md:rounded-b-xl flex gap-3">
-                <button onclick="App.ui.modalLancamento.close()" class="flex-1 py-3 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition-colors">Cancelar</button>
-                <button onclick="App.controllers.salvarEntrega()" class="flex-[2] py-3 bg-brand-600 text-white font-bold rounded-lg shadow-lg hover:bg-brand-700 transition-colors">Confirmar Lançamento</button>
+            <div class="flex-none p-4 border-t border-slate-100 bg-white md:rounded-b-xl flex gap-3">
+                <button onclick="App.ui.modalLancamento.close()" class="flex-1 py-3 text-slate-600 font-medium hover:bg-slate-50 rounded-lg transition-colors border border-slate-200">Cancelar</button>
+                <button onclick="App.controllers.salvarEntrega()" class="flex-[2] py-3 bg-slate-800 text-white font-bold rounded-lg shadow-lg hover:bg-slate-900 transition-colors">Confirmar Lançamento</button>
             </div>
         </div>
     </div>
@@ -268,7 +273,7 @@
         </div>
     </div>
     
-    <!-- NOVO: Modal Pós Venda -->
+    <!-- Modal Pós Venda -->
     <div id="modal-pos-venda" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 p-4">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm">
             <div class="p-4 border-b flex justify-between items-center bg-purple-50 rounded-t-xl">
@@ -280,22 +285,10 @@
             </div>
             <div class="p-4 space-y-3">
                 <p class="text-sm text-gray-600 mb-2">Selecione a mensagem para <strong id="pos-venda-cliente-nome">Cliente</strong>:</p>
-                
-                <button onclick="App.controllers.enviarPosVenda(1)" class="w-full text-left p-3 rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100 transition-all font-medium flex items-center gap-3">
-                    <span class="text-xl">🙏</span> Agradecimento
-                </button>
-                
-                <button onclick="App.controllers.enviarPosVenda(2)" class="w-full text-left p-3 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 border border-green-100 transition-all font-medium flex items-center gap-3">
-                    <span class="text-xl">🎫</span> Cupom R$ 10,00 (30 dias)
-                </button>
-                
-                <button onclick="App.controllers.enviarPosVenda(3)" class="w-full text-left p-3 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-100 transition-all font-medium flex items-center gap-3">
-                    <span class="text-xl">⭐</span> Avaliar no Google
-                </button>
-    
-                <button onclick="App.controllers.enviarPosVenda(4)" class="w-full text-left p-3 rounded-lg bg-pink-50 text-pink-700 hover:bg-pink-100 border border-pink-100 transition-all font-medium flex items-center gap-3">
-                    <span class="text-xl">📸</span> Seguir no Instagram
-                </button>
+                <button onclick="App.controllers.enviarPosVenda(1)" class="w-full text-left p-3 rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100 transition-all font-medium flex items-center gap-3"><span class="text-xl">🙏</span> Agradecimento</button>
+                <button onclick="App.controllers.enviarPosVenda(2)" class="w-full text-left p-3 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 border border-green-100 transition-all font-medium flex items-center gap-3"><span class="text-xl">🎫</span> Cupom R$ 10,00</button>
+                <button onclick="App.controllers.enviarPosVenda(3)" class="w-full text-left p-3 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-100 transition-all font-medium flex items-center gap-3"><span class="text-xl">⭐</span> Avaliar no Google</button>
+                <button onclick="App.controllers.enviarPosVenda(4)" class="w-full text-left p-3 rounded-lg bg-pink-50 text-pink-700 hover:bg-pink-100 border border-pink-100 transition-all font-medium flex items-center gap-3"><span class="text-xl">📸</span> Seguir no Instagram</button>
             </div>
         </div>
     </div>
@@ -322,38 +315,32 @@
     <!-- Modal Exportar -->
     <div id="modal-exportar" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 p-4">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Exportar Rota</h3>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">Exportar Rota</h3>
             <div class="space-y-2 mb-4">
-                <p class="text-sm text-gray-500 mb-2">Selecione as regiões:</p>
-                <div class="grid grid-cols-2 gap-2" id="export-regioes-list">
-                    <!-- Checkboxes injetados -->
-                </div>
+                <p class="text-sm text-slate-500 mb-2">Selecione as regiões:</p>
+                <div class="grid grid-cols-2 gap-2" id="export-regioes-list"></div>
             </div>
-            <button onclick="App.controllers.baixarBackup()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">Baixar JSON</button>
-            <button onclick="App.ui.modalExport.close()" class="w-full mt-2 text-gray-500 py-2 hover:bg-gray-100 rounded-lg">Cancelar</button>
+            <button onclick="App.controllers.baixarBackup()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 shadow-md transition-colors">Baixar JSON</button>
+            <button onclick="App.ui.modalExport.close()" class="w-full mt-2 text-slate-500 py-2 hover:bg-slate-100 rounded-lg transition-colors">Cancelar</button>
         </div>
     </div>
 
-    <!-- NOVO: Modal Relatório Cestas -->
+    <!-- Modal Relatório Cestas -->
     <div id="modal-relatorio" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 p-4">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
             <h3 class="text-xl font-bold text-green-800 mb-2 flex items-center gap-2">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654z"/></svg>
                 Relatório de Cestas
             </h3>
-            <p class="text-sm text-gray-500 mb-4">Selecione as regiões para gerar o relatório no WhatsApp:</p>
-            
+            <p class="text-sm text-slate-500 mb-4">Selecione as regiões para gerar o relatório:</p>
             <div class="space-y-2 mb-6">
-                <div class="grid grid-cols-2 gap-2" id="relatorio-regioes-list">
-                    <!-- Checkboxes injetados -->
-                </div>
+                <div class="grid grid-cols-2 gap-2" id="relatorio-regioes-list"></div>
             </div>
-            
-            <button onclick="App.controllers.gerarRelatorioCestas()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 flex items-center justify-center gap-2">
+            <button onclick="App.controllers.gerarRelatorioCestas()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 flex items-center justify-center gap-2 shadow-md transition-colors">
                 Enviar para WhatsApp
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </button>
-            <button onclick="App.ui.modalRelatorio.close()" class="w-full mt-2 text-gray-500 py-2 hover:bg-gray-100 rounded-lg">Cancelar</button>
+            <button onclick="App.ui.modalRelatorio.close()" class="w-full mt-2 text-slate-500 py-2 hover:bg-slate-100 rounded-lg transition-colors">Cancelar</button>
         </div>
     </div>
 
@@ -361,81 +348,58 @@
 
     <!-- JAVASCRIPT APP -->
     <script>
-        /**
-         * RotaFlow Core Logic
-         * Arquitetura: Singleton State Management
-         */
-
         const CONSTANTS = {
             PIX_NOME: "Osvaldo Sereia Junior",
             PIX_CELULAR: "65984491018",
             NUMERO_GERENTE: "5565996884599",
             NUMERO_RELATORIO: "5565998150975",
-            NUMERO_CONFIRMACAO_ENTREGA: "5565998150975", // Novo número para confirmação
+            NUMERO_CONFIRMACAO_ENTREGA: "5565998150975",
             REGIOES: ["VG", "CUIABA", "COXIPO", "CPA"],
-            STORAGE_KEY: "rotaflow_v2_db"
+            STORAGE_KEY: "rotaflow_v2_db",
+            CESTAS_OPTIONS: [
+                { value: "ESPECIAL", label: "ESPECIAL", price: 0.00 },
+                { value: "Mini Bonini", label: "Mini Bonini", price: 165.00 },
+                { value: "Mini Koblenz", label: "Mini Koblenz", price: 170.00 },
+                { value: "Pequena Bonini", label: "Pequena Bonini", price: 215.00 },
+                { value: "Pequena Koblenz", label: "Pequena Koblenz", price: 220.00 },
+                { value: "Média Bonini", label: "Média Bonini", price: 320.00 },
+                { value: "Média Koblenz", label: "Média Koblenz", price: 325.00 },
+                { value: "Grande Bonini", label: "Grande Bonini", price: 380.00 },
+                { value: "Grande Koblenz", label: "Grande Koblenz", price: 390.00 }
+            ]
         };
 
-        // --- Store (Estado da Aplicação) ---
         const Store = {
-            data: {
-                rotaAtiva: null,
-                regiaoFiltro: 'VG',
-                carrinhoTemp: [],
-                entregaEmAcaoId: null // ID da entrega sendo paga ou contatada
-            },
-
+            data: { rotaAtiva: null, regiaoFiltro: 'VG', carrinhoTemp: [], entregaEmAcaoId: null },
             init() {
                 const saved = localStorage.getItem(CONSTANTS.STORAGE_KEY);
                 if (saved) {
                     this.data.rotaAtiva = JSON.parse(saved);
-                    // Garantir compatibilidade de estrutura se houver dados antigos
                     if(!Array.isArray(this.data.rotaAtiva.entregas)) this.data.rotaAtiva.entregas = [];
-                } else {
-                    this.novaRota();
-                }
+                } else { this.novaRota(); }
             },
-
             novaRota() {
-                this.data.rotaAtiva = {
-                    id: Date.now(),
-                    dataCriacao: new Date().toISOString(),
-                    entregas: []
-                };
+                this.data.rotaAtiva = { id: Date.now(), dataCriacao: new Date().toISOString(), entregas: [] };
                 this.save();
             },
-
             save() {
                 localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(this.data.rotaAtiva));
                 App.ui.render();
             },
-
             getEntregasFiltradas() {
                 if (!this.data.rotaAtiva) return [];
                 let lista = this.data.rotaAtiva.entregas.filter(e => e.regiao === this.data.regiaoFiltro);
-                
-                // Ordenação: Pendentes Primeiro -> Finalizadas por horário
                 return lista.sort((a, b) => {
                     if (a.status === 'Pendente' && b.status !== 'Pendente') return -1;
                     if (a.status !== 'Pendente' && b.status === 'Pendente') return 1;
-                    if (a.status !== 'Pendente' && b.status !== 'Pendente') {
-                        return new Date(a.updatedAt || 0) - new Date(b.updatedAt || 0); // Mais antigos primeiro no final
-                    }
-                    return 0; // Ordem de criação
+                    return 0; 
                 });
             },
-
-            addEntrega(entrega) {
-                this.data.rotaAtiva.entregas.push(entrega);
-                this.save();
-            },
-
+            addEntrega(entrega) { this.data.rotaAtiva.entregas.push(entrega); this.save(); },
             updateEntrega(id, updates) {
                 const index = this.data.rotaAtiva.entregas.findIndex(e => e.id == id);
                 if (index !== -1) {
                     this.data.rotaAtiva.entregas[index] = { ...this.data.rotaAtiva.entregas[index], ...updates, updatedAt: new Date().toISOString() };
-                    
-                    // Se foi finalizada, move pro final da lista lógica (embora a ordenação visual já cuide disso)
                     if(updates.status && updates.status !== 'Pendente') {
                         const item = this.data.rotaAtiva.entregas.splice(index, 1)[0];
                         this.data.rotaAtiva.entregas.push(item);
@@ -443,33 +407,21 @@
                     this.save();
                 }
             },
-
             moverEntrega(id, direcao) {
                 const entregas = this.data.rotaAtiva.entregas;
-                const regiao = this.data.regiaoFiltro;
-                
-                // Pegar apenas índices das entregas da região atual E pendentes
-                const indicesRegiao = entregas
-                    .map((e, i) => ({ ...e, originalIndex: i }))
-                    .filter(e => e.regiao === regiao && e.status === 'Pendente');
-
+                const indicesRegiao = entregas.map((e, i) => ({ ...e, originalIndex: i })).filter(e => e.regiao === this.data.regiaoFiltro && e.status === 'Pendente');
                 const itemRegiaoIndex = indicesRegiao.findIndex(e => e.id == id);
                 if (itemRegiaoIndex === -1) return;
-
                 const targetRegiaoIndex = direcao === 'cima' ? itemRegiaoIndex - 1 : itemRegiaoIndex + 1;
-
                 if (targetRegiaoIndex >= 0 && targetRegiaoIndex < indicesRegiao.length) {
                     const idxA = indicesRegiao[itemRegiaoIndex].originalIndex;
                     const idxB = indicesRegiao[targetRegiaoIndex].originalIndex;
-                    
-                    // Swap no array principal
                     [entregas[idxA], entregas[idxB]] = [entregas[idxB], entregas[idxA]];
                     this.save();
                 }
             }
         };
 
-        // --- Helpers ---
         const Utils = {
             formatMoeda: (valor) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0),
             formatData: (iso) => new Date(iso).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }),
@@ -477,18 +429,13 @@
             toast: (msg, type = 'info') => {
                 const container = document.getElementById('toast-container');
                 const el = document.createElement('div');
-                el.className = `toast text-sm font-medium ${type === 'error' ? 'border-red-500 text-red-800' : 'text-gray-800'}`;
+                el.className = `toast text-sm font-medium ${type === 'error' ? 'border-red-500 text-red-800' : 'text-slate-800'}`;
                 el.innerHTML = msg;
                 container.appendChild(el);
-                setTimeout(() => {
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateX(100%)';
-                    setTimeout(() => el.remove(), 300);
-                }, 3000);
+                setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(100%)'; setTimeout(() => el.remove(), 300); }, 3000);
             }
         };
 
-        // --- UI Manager ---
         const App = {
             ui: {
                 modalLancamento: {
@@ -499,555 +446,266 @@
                         document.getElementById('input-cliente').value = '';
                         document.getElementById('info-cliente-preview').classList.add('hidden');
                         document.getElementById('input-valor-final').value = '';
+                        
+                        // Reset Custom Dropdowns
+                        App.controllers.fecharDropdownCliente();
+                        App.controllers.fecharDropdownCesta();
                     },
                     close: () => document.getElementById('modal-lancamento').classList.add('hidden')
                 },
                 modalExport: {
                     open: () => {
                         const container = document.getElementById('export-regioes-list');
-                        container.innerHTML = CONSTANTS.REGIOES.map(r => `
-                            <label class="flex items-center space-x-2 border p-2 rounded cursor-pointer">
-                                <input type="checkbox" checked value="${r}" class="text-blue-600 rounded focus:ring-blue-500">
-                                <span class="text-sm text-gray-700">${r}</span>
-                            </label>
-                        `).join('');
+                        container.innerHTML = CONSTANTS.REGIOES.map(r => `<label class="flex items-center space-x-2 border p-2 rounded cursor-pointer"><input type="checkbox" checked value="${r}" class="text-blue-600 rounded focus:ring-blue-500"><span class="text-sm text-slate-700">${r}</span></label>`).join('');
                         document.getElementById('modal-exportar').classList.remove('hidden');
                     },
                     close: () => document.getElementById('modal-exportar').classList.add('hidden')
                 },
                 modalRelatorio: {
                     open: () => {
-                        // Fecha o menu principal ao abrir o modal
                         document.getElementById('main-menu').classList.add('hidden');
-                        
                         const container = document.getElementById('relatorio-regioes-list');
-                        container.innerHTML = CONSTANTS.REGIOES.map(r => `
-                            <label class="flex items-center space-x-2 border p-2 rounded cursor-pointer bg-gray-50 hover:bg-gray-100">
-                                <input type="checkbox" checked value="${r}" class="text-green-600 rounded focus:ring-green-500">
-                                <span class="text-sm text-gray-700 font-medium">${r}</span>
-                            </label>
-                        `).join('');
+                        container.innerHTML = CONSTANTS.REGIOES.map(r => `<label class="flex items-center space-x-2 border p-2 rounded cursor-pointer bg-slate-50 hover:bg-slate-100"><input type="checkbox" checked value="${r}" class="text-green-600 rounded focus:ring-green-500"><span class="text-sm text-slate-700 font-medium">${r}</span></label>`).join('');
                         document.getElementById('modal-relatorio').classList.remove('hidden');
                     },
                     close: () => document.getElementById('modal-relatorio').classList.add('hidden')
                 },
-
-                toggleMenu: () => {
-                    const menu = document.getElementById('main-menu');
-                    menu.classList.toggle('hidden');
-                },
-
+                toggleMenu: () => { document.getElementById('main-menu').classList.toggle('hidden'); },
                 renderCarrinho: () => {
                     const container = document.getElementById('carrinho-visual');
                     const totalInput = document.getElementById('input-valor-final');
-                    
-                    if(Store.data.carrinhoTemp.length === 0) {
-                        container.innerHTML = '<div class="text-center text-gray-400 text-sm py-2">Nenhum item adicionado</div>';
-                        totalInput.value = '';
-                        return;
-                    }
-
+                    if(Store.data.carrinhoTemp.length === 0) { container.innerHTML = '<div class="text-center text-slate-400 text-sm py-2">Nenhum item adicionado</div>'; totalInput.value = ''; return; }
                     let totalCalculado = 0;
                     container.innerHTML = Store.data.carrinhoTemp.map((item, idx) => {
                         totalCalculado += (item.valor * item.qtd);
-                        return `
-                        <div class="flex justify-between items-start bg-white p-2 rounded border border-gray-100 shadow-sm animate-in fade-in">
-                            <div>
-                                <p class="text-sm font-bold text-gray-800">${item.qtd}x ${item.nome}</p>
-                                ${item.tipo === 'Alterada' ? `<p class="text-xs text-amber-600 font-medium">⚠️ Alterada: ${item.codigoAlterada}</p>` : ''}
-                                ${item.brindes && item.brindes.length ? `<p class="text-xs text-pink-500">+ ${item.brindes.join(', ')}</p>` : ''}
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-semibold text-blue-600">${Utils.formatMoeda(item.valor * item.qtd)}</span>
-                                <button onclick="App.controllers.removerItemCarrinho(${idx})" class="text-red-400 hover:text-red-600">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                </button>
-                            </div>
-                        </div>
-                    `}).join('');
-
-                    // Só atualiza se o usuário não tiver editado manualmente (ou se estiver vazio)
-                    if (!totalInput.value || parseFloat(totalInput.value) === 0) {
-                        totalInput.value = totalCalculado.toFixed(2);
-                    }
+                        return `<div class="flex justify-between items-start bg-white p-2 rounded border border-slate-100 shadow-sm animate-in fade-in"><div><p class="text-sm font-bold text-slate-800">${item.qtd}x ${item.nome}</p>${item.tipo === 'Alterada' ? `<div class="text-xs mt-1">${item.tirar ? `<span class="text-red-500 font-semibold block">Tirar: ${item.tirar}</span>` : ''}${item.por ? `<span class="text-green-600 font-semibold block">Pôr: ${item.por}</span>` : ''}${(!item.tirar && !item.por && item.codigoAlterada) ? `<div class="text-xs text-amber-600">${item.codigoAlterada}</div>` : ''}</div>` : ''}${item.brindes && item.brindes.length ? `<p class="text-xs text-pink-500">+ ${item.brindes.join(', ')}</p>` : ''}</div><div class="flex items-center gap-2"><span class="text-sm font-semibold text-blue-600">${Utils.formatMoeda(item.valor * item.qtd)}</span><button onclick="App.controllers.removerItemCarrinho(${idx})" class="text-red-400 hover:text-red-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div></div>`;
+                    }).join('');
+                    if (!totalInput.value || parseFloat(totalInput.value) === 0) totalInput.value = totalCalculado.toFixed(2);
                 },
-
                 render: () => {
                     const entregas = Store.getEntregasFiltradas();
                     const container = document.getElementById('lista-entregas');
                     const emptyState = document.getElementById('lista-vazia');
-                    
-                    // Header Data
                     document.getElementById('header-date').innerText = Utils.formatData(Store.data.rotaAtiva.dataCriacao);
-
-                    // KPIs
                     const totalGeral = Store.data.rotaAtiva.entregas.length;
                     const entreguesGeral = Store.data.rotaAtiva.entregas.filter(e => e.status === 'Entregue').length;
-                    
-                    // Lógica de Emojis e Frases
                     let percentual = totalGeral > 0 ? (entreguesGeral / totalGeral) * 100 : 0;
-                    let emoji = '😴';
-                    let frase = 'Vamos começar?';
-                    let corBarra = 'bg-gray-200';
-
+                    let emoji = '😴', frase = 'Vamos começar?', corBarra = 'bg-slate-200';
                     if (percentual > 0 && percentual <= 25) { emoji = '🐢'; frase = 'Ritmo de tartaruga...'; corBarra = 'bg-red-400'; }
                     else if (percentual > 25 && percentual <= 50) { emoji = '🚶'; frase = 'Caminhando...'; corBarra = 'bg-orange-400'; }
                     else if (percentual > 50 && percentual <= 75) { emoji = '🏃'; frase = 'Acelerando!'; corBarra = 'bg-blue-400'; }
                     else if (percentual > 75 && percentual < 100) { emoji = '🔥'; frase = 'Quase lá!'; corBarra = 'bg-indigo-500'; }
                     else if (percentual === 100 && totalGeral > 0) { emoji = '🚀'; frase = 'Missão Cumprida!'; corBarra = 'bg-green-500'; }
-
-                    document.getElementById('kpi-container').innerHTML = `
-                        <div class="bg-white p-4 rounded-xl shadow-md border border-gray-100 flex items-center justify-between">
-                            <div class="flex-1">
-                                <p class="text-gray-500 text-sm font-bold uppercase mb-1">${frase}</p>
-                                <div class="flex items-baseline gap-2">
-                                    <span class="text-4xl font-black text-gray-800">${entreguesGeral}</span>
-                                    <span class="text-lg text-gray-400 font-medium">de ${totalGeral}</span>
-                                </div>
-                                <div class="w-full bg-gray-100 rounded-full h-2.5 mt-2">
-                                    <div class="${corBarra} h-2.5 rounded-full transition-all duration-500" style="width: ${percentual}%"></div>
-                                </div>
-                            </div>
-                            <div class="text-5xl ml-4 animate-bounce filter drop-shadow-sm">${emoji}</div>
-                        </div>
-                    `;
-
-                    // Filtros
+                    document.getElementById('kpi-container').innerHTML = `<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between"><div class="flex-1"><p class="text-slate-500 text-sm font-bold uppercase mb-1">${frase}</p><div class="flex items-baseline gap-2"><span class="text-4xl font-black text-slate-800">${entreguesGeral}</span><span class="text-lg text-slate-400 font-medium">de ${totalGeral}</span></div><div class="w-full bg-slate-100 rounded-full h-2.5 mt-2"><div class="${corBarra} h-2.5 rounded-full transition-all duration-500" style="width: ${percentual}%"></div></div></div><div class="text-5xl ml-4 animate-bounce filter drop-shadow-sm grayscale hover:grayscale-0 transition-all cursor-default">${emoji}</div></div>`;
                     const regioesHtml = CONSTANTS.REGIOES.map(r => {
                         const count = Store.data.rotaAtiva.entregas.filter(e => e.regiao === r && e.status === 'Pendente').length;
                         const active = Store.data.regiaoFiltro === r;
-                        return `
-                            <button onclick="App.controllers.mudarFiltro('${r}')" class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors border ${active ? 'bg-brand-600 text-white border-brand-600 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}">
-                                ${r} <span class="${active ? 'bg-brand-500 text-white' : 'bg-gray-200 text-gray-600'} text-xs py-0.5 px-1.5 rounded-full ml-1">${count}</span>
-                            </button>
-                        `;
+                        return `<button onclick="App.controllers.mudarFiltro('${r}')" class="whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors border ${active ? 'bg-slate-800 text-white border-slate-800 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}">${r} <span class="${active ? 'bg-slate-600 text-white' : 'bg-slate-200 text-slate-600'} text-xs py-0.5 px-1.5 rounded-full ml-1">${count}</span></button>`;
                     }).join('');
                     document.getElementById('filtros-regiao').innerHTML = regioesHtml;
-
-                    // Lista
-                    if (entregas.length === 0) {
-                        container.innerHTML = '';
-                        emptyState.classList.remove('hidden');
-                        emptyState.classList.add('flex');
-                        return;
-                    }
-                    
-                    emptyState.classList.add('hidden');
-                    emptyState.classList.remove('flex');
-
+                    if (entregas.length === 0) { container.innerHTML = ''; emptyState.classList.remove('hidden'); emptyState.classList.add('flex'); return; }
+                    emptyState.classList.add('hidden'); emptyState.classList.remove('flex');
                     container.innerHTML = entregas.map((entrega, index) => {
                         const isPendente = entrega.status === 'Pendente';
                         const total = parseFloat(entrega.valorTotalAjustado || 0);
-                        
-                        // Lógica para badge "Final XX" se houver alteração
                         const temAlteracao = entrega.cestas.some(c => c.tipo === 'Alterada');
                         let badgeFinal = '';
-                        if (temAlteracao && entrega.cliente.celular) {
-                            const nums = entrega.cliente.celular.replace(/\D/g, '');
-                            if (nums.length >= 2) {
-                                badgeFinal = `<div class="bg-red-100 text-red-800 text-xs font-black px-2 py-1 rounded border border-red-200 uppercase tracking-wide">FINAL ${nums.slice(-2)}</div>`;
-                            }
-                        }
-
-                        // Geração da lista de itens
-                        const itensHtml = entrega.cestas.map(c => `
-                            <div class="flex flex-col border-b border-gray-100 last:border-0 pb-1 mb-1 last:pb-0 last:mb-0">
-                                <span class="text-base font-bold text-gray-800">${c.qtd}x ${c.nome}</span>
-                                ${c.tipo === 'Alterada' ? `<span class="text-xs text-amber-600 font-semibold mt-0.5">⚠️ Item com Alteração: ${c.codigoAlterada || 'Ver detalhes'}</span>` : ''}
-                                ${c.brindes && c.brindes.length > 0 ? `<span class="text-xs text-pink-500 font-medium mt-0.5">+ ${c.brindes.join(', ')}</span>` : ''}
-                            </div>
-                        `).join('');
-
-                        // Link para ligar
+                        if (temAlteracao && entrega.cliente.celular) { const nums = entrega.cliente.celular.replace(/\D/g, ''); if (nums.length >= 2) badgeFinal = `<div class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-100 uppercase tracking-wide">FINAL ${nums.slice(-2)}</div>`; }
                         const telLink = entrega.cliente.celular ? `tel:${entrega.cliente.celular.replace(/\D/g, '')}` : '#';
-
-                        return `
-                        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden relative transition-transform transform ${isPendente ? 'hover:shadow-lg' : 'opacity-80 bg-gray-50'}">
-                            ${!isPendente ? `
-                                <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-                                    <div class="bg-white/90 border-2 ${entrega.status === 'Entregue' ? 'border-green-500 text-green-600' : 'border-red-500 text-red-600'} px-4 py-1 rounded-lg text-xl font-black uppercase rotate-[-12deg] shadow-lg">
-                                        ${entrega.status}
-                                    </div>
+                        const itensHtml = entrega.cestas.map(c => `
+                            <div class="py-2">
+                                <div class="flex justify-between items-center text-slate-900">
+                                    <div class="text-base font-bold flex-1 truncate pr-2">${c.qtd}x ${c.nome}</div>
+                                    <div class="text-base font-semibold text-slate-600 whitespace-nowrap">${Utils.formatMoeda(c.valor * c.qtd)}</div>
                                 </div>
-                            ` : ''}
-                            
-                            <div class="p-4">
-                                <!-- Cabeçalho do Card: Nome e Preço -->
-                                <div class="flex justify-between items-start mb-3">
-                                    <div class="flex flex-col">
-                                        <h4 class="text-lg font-extrabold text-gray-900 leading-tight">${entrega.cliente.nome}</h4>
-                                        <!-- Badge Final XX se existir -->
-                                        ${badgeFinal ? `<div class="mt-1">${badgeFinal}</div>` : ''}
-                                    </div>
-                                    <span class="text-lg font-bold text-brand-700 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100 whitespace-nowrap">${Utils.formatMoeda(total)}</span>
-                                </div>
-
-                                <!-- Informações de Endereço -->
-                                <div class="mb-4 space-y-1 pl-1">
-                                    <div class="flex items-start gap-2 text-gray-700">
-                                        <svg class="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                        <span class="text-sm font-medium leading-snug">${entrega.cliente.endereco || 'Sem endereço'}</span>
-                                    </div>
-                                    ${entrega.cliente.complemento ? `
-                                        <div class="ml-7">
-                                            <span class="text-base font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 inline-block">Comp: ${entrega.cliente.complemento}</span>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                                
-                                <!-- Lista de Itens -->
-                                <div class="bg-gray-50 rounded-lg border border-gray-200 p-3 mb-4">
-                                    ${itensHtml}
-                                    ${entrega.observacao ? `<div class="mt-2 pt-2 border-t border-gray-200 text-red-600 text-sm font-bold flex items-start gap-1"><svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> OBS: ${entrega.observacao}</div>` : ''}
-                                </div>
-
-                                ${entrega.status === 'Entregue' ? `<p class="text-xs text-green-700 font-medium text-right mb-2 bg-green-50 p-1 rounded inline-block w-full text-center">Pago via: ${entrega.formaPagamento.join(', ')} às ${Utils.formatHora(entrega.updatedAt)}</p>` : ''}
-
-                                <!-- Botões de Ação -->
-                                <div class="grid grid-cols-4 gap-2">
-                                    <!-- Botão Zap -->
-                                    <button onclick="App.controllers.abrirZap(${entrega.id})" class="col-span-1 bg-green-100 text-green-700 py-3 rounded-lg hover:bg-green-200 border border-green-200 flex flex-col items-center justify-center transition-colors h-14">
-                                        <svg class="w-6 h-6 mb-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.017-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                                        <span class="text-xs font-bold">ZAP</span>
-                                    </button>
-
-                                    <!-- Botão Ligar (Novo) -->
-                                    <a href="${telLink}" class="col-span-1 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 border border-gray-200 flex flex-col items-center justify-center transition-colors h-14">
-                                        <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                                        <span class="text-xs font-bold">LIGAR</span>
-                                    </a>
-
-                                    <!-- Botão Mapa -->
-                                    <button onclick="App.controllers.abrirMapa('${entrega.cliente.endereco}')" class="col-span-1 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 border border-gray-200 flex flex-col items-center justify-center transition-colors h-14">
-                                        <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7"/></svg>
-                                        <span class="text-xs font-bold">MAPA</span>
-                                    </button>
-                                    
-                                    ${isPendente ? `
-                                        <!-- Botão Entregar -->
-                                        <button onclick="App.controllers.iniciarPagamento(${entrega.id})" class="col-span-1 bg-brand-600 text-white py-3 rounded-lg hover:bg-brand-700 shadow-md flex flex-col items-center justify-center transition-colors h-14">
-                                            <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            <span class="text-xs font-bold">OK</span>
-                                        </button>
-                                    ` : (entrega.status === 'Entregue' ? `
-                                        <!-- Botão Pós Venda -->
-                                        <button onclick="App.controllers.abrirPosVenda(${entrega.id})" class="col-span-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 shadow-md flex flex-col items-center justify-center transition-colors h-14">
-                                            <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                            <span class="text-xs font-bold">PÓS</span>
-                                        </button>
-                                    ` : '')}
-                                </div>
-                                ${isPendente ? `
-                                    <div class="mt-3 flex justify-between items-center px-1">
-                                        <div class="flex gap-4">
-                                            <button onclick="App.controllers.moverEntrega(${entrega.id}, 'cima')" class="text-gray-400 hover:text-brand-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
-                                            <button onclick="App.controllers.moverEntrega(${entrega.id}, 'baixo')" class="text-gray-400 hover:text-brand-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
-                                        </div>
-                                        <button onclick="App.controllers.cancelarEntrega(${entrega.id})" class="text-xs text-red-400 hover:text-red-600 font-medium">Cancelar</button>
-                                    </div>
-                                ` : ''}
+                                ${c.tipo === 'Alterada' ? `<div class="mt-2 pt-2 border-t border-slate-100 text-sm text-slate-600">${c.tirar ? `<div class="flex gap-1"><span class="font-bold text-red-600">Tirar:</span> <span>${c.tirar}</span></div>` : ''}${c.por ? `<div class="flex gap-1"><span class="font-bold text-green-600">Pôr:</span> <span>${c.por}</span></div>` : ''}${(!c.tirar && !c.por && c.codigoAlterada) ? `<div>${c.codigoAlterada}</div>` : ''}</div>` : ''}
+                                ${c.brindes && c.brindes.length ? `<div class="mt-2 pt-2 border-t border-slate-100 text-sm text-slate-600 font-medium"><span class="text-slate-400 font-normal mr-1">Brinde:</span> ${c.brindes.join(', ')}</div>` : ''}
                             </div>
-                        </div>
-                        `;
+                        `).join('<div class="border-b border-slate-100 my-1"></div>');
+                        return `
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative transition-transform transform ${isPendente ? 'hover:shadow-md' : 'opacity-70 bg-slate-50'}">
+                            ${!isPendente ? `<div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"><div class="bg-white/90 border-2 ${entrega.status === 'Entregue' ? 'border-green-500 text-green-600' : 'border-red-500 text-red-600'} px-4 py-1 rounded-lg text-xl font-black uppercase rotate-[-12deg] shadow-lg">${entrega.status}</div></div>` : ''}
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-3"><div class="flex items-center gap-2"><h4 class="text-lg font-bold text-slate-900 leading-tight truncate max-w-[200px]" title="${entrega.cliente.nome}">${entrega.cliente.nome}</h4>${badgeFinal}</div></div>
+                                ${entrega.cliente.complemento ? `<div class="mb-4"><p class="text-base font-medium text-slate-700 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 inline-block leading-snug w-full">${entrega.cliente.complemento}</p></div>` : ''}
+                                <div class="mb-4 border-t border-b border-slate-100 py-1">${itensHtml}</div>
+                                ${entrega.observacao ? `<div class="mb-4 pt-2 border-t border-slate-100"><p class="text-sm text-red-600 font-bold flex items-start gap-1"><svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>${entrega.observacao}</p></div>` : ''}
+                                ${entrega.status === 'Entregue' ? `<p class="text-xs text-green-700 font-medium text-center mb-3 bg-green-50 py-1 rounded">Pago via: ${entrega.formaPagamento.join(', ')}</p>` : ''}
+                                <div class="space-y-3"><div class="grid grid-cols-2 gap-3"><button onclick="App.controllers.abrirZap(${entrega.id})" class="py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 transition-colors uppercase tracking-wide">WhatsApp</button><button onclick="App.controllers.abrirMapa('${entrega.cliente.endereco}')" class="py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 transition-colors uppercase tracking-wide">Mapa</button></div><div class="grid grid-cols-3 gap-3"><a href="${telLink}" class="py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-center uppercase tracking-wide">Ligar</a>${isPendente ? `<button onclick="App.controllers.iniciarPagamento(${entrega.id})" class="col-span-1 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-900 shadow-sm transition-colors uppercase tracking-wide">Entregue</button><button onclick="App.controllers.cancelarEntrega(${entrega.id})" class="col-span-1 py-2.5 bg-white border border-red-100 text-red-500 text-xs font-bold rounded-lg hover:bg-red-50 transition-colors uppercase tracking-wide">Cancelar</button>` : (entrega.status === 'Entregue' ? `<button onclick="App.controllers.abrirPosVenda(${entrega.id})" class="col-span-2 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-900 shadow-sm transition-colors uppercase tracking-wide">Pós Venda</button>` : '')}</div>${isPendente ? `<div class="flex justify-center gap-6 mt-2 pt-2 border-t border-slate-50"><button onclick="App.controllers.moverEntrega(${entrega.id}, 'cima')" class="text-slate-300 hover:text-slate-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button><button onclick="App.controllers.moverEntrega(${entrega.id}, 'baixo')" class="text-slate-300 hover:text-slate-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button></div>` : ''}</div></div></div>`;
                     }).join('');
                 }
             },
-
             controllers: {
-                novaRota: () => {
-                    if(confirm('Isso apagará a rota atual e criará uma nova. Confirmar?')) {
-                        Store.novaRota();
-                        window.location.reload();
-                    }
+                novaRota: () => { if(confirm('Isso apagará a rota atual e criará uma nova. Confirmar?')) { Store.novaRota(); window.location.reload(); } },
+                mudarFiltro: (regiao) => { Store.data.regiaoFiltro = regiao; App.ui.render(); },
+                toggleCheckAlterada: () => { const check = document.getElementById('check-alterada'); const box = document.getElementById('box-detalhes-alterada'); if(check.checked) box.classList.remove('hidden'); else box.classList.add('hidden'); },
+                
+                // --- NOVAS FUNÇÕES PARA DROPDOWNS CUSTOMIZADOS ---
+                
+                // 1. Cliente
+                abrirDropdownCliente: () => { document.getElementById('dropdown-clientes').classList.remove('hidden'); },
+                fecharDropdownCliente: () => { setTimeout(() => document.getElementById('dropdown-clientes').classList.add('hidden'), 200); },
+                selecionarCliente: (nome) => {
+                    document.getElementById('input-cliente').value = nome;
+                    // Disparar evento de input manualmente para atualizar preview
+                    const event = new Event('input');
+                    document.getElementById('input-cliente').dispatchEvent(event);
+                    App.controllers.fecharDropdownCliente();
                 },
                 
-                mudarFiltro: (regiao) => {
-                    Store.data.regiaoFiltro = regiao;
-                    App.ui.render();
-                },
-
-                // --- Lógica de Carrinho e Lançamento ---
-                toggleCheckAlterada: () => {
-                    const check = document.getElementById('check-alterada');
-                    const box = document.getElementById('box-detalhes-alterada');
-                    if(check.checked) box.classList.remove('hidden');
-                    else box.classList.add('hidden');
+                // 2. Cesta
+                toggleDropdownCesta: () => { document.getElementById('dropdown-cestas').classList.toggle('hidden'); },
+                fecharDropdownCesta: () => { document.getElementById('dropdown-cestas').classList.add('hidden'); },
+                selecionarCesta: (valor, label, preco) => {
+                    document.getElementById('label-select-cesta').innerText = label;
+                    document.getElementById('hidden-cesta-nome').value = valor;
+                    document.getElementById('hidden-cesta-valor').value = preco;
+                    document.getElementById('label-select-cesta').classList.add('text-slate-900', 'font-medium'); // Destaque visual
+                    App.controllers.fecharDropdownCesta();
                 },
 
                 adicionarItemAoCarrinho: () => {
-                    const select = document.getElementById('select-cesta');
+                    // Leitura dos valores customizados
+                    const nomeCesta = document.getElementById('hidden-cesta-nome').value;
+                    const valorCesta = parseFloat(document.getElementById('hidden-cesta-valor').value);
                     const qtd = parseInt(document.getElementById('qtd-cesta').value);
-                    const option = select.options[select.selectedIndex];
                     const isAlterada = document.getElementById('check-alterada').checked;
                     
+                    if(!nomeCesta) return Utils.toast('Selecione uma cesta', 'error');
                     if(qtd < 1) return Utils.toast('Quantidade inválida', 'error');
 
                     const item = {
-                        nome: select.value,
-                        valor: parseFloat(option.dataset.valor || 0),
+                        nome: nomeCesta,
+                        valor: valorCesta,
                         qtd: qtd,
                         tipo: isAlterada ? 'Alterada' : 'Normal',
-                        codigoAlterada: isAlterada ? document.getElementById('txt-alteracao').value : '',
-                        partesAlteradas: isAlterada ? Array.from(document.querySelectorAll('input[name="partes_alt"]:checked')).map(el => el.value) : [],
+                        tirar: isAlterada ? document.getElementById('input-tirar').value : '',
+                        por: isAlterada ? document.getElementById('input-por').value : '',
+                        codigoAlterada: isAlterada ? (document.getElementById('input-tirar').value || document.getElementById('input-por').value ? '' : 'Alteração sem detalhes') : '', 
+                        partesAlteradas: [],
                         brindes: Array.from(document.querySelectorAll('input[name="brindes"]:checked')).map(el => el.value)
                     };
 
                     Store.data.carrinhoTemp.push(item);
                     App.ui.renderCarrinho();
                     
-                    // Reset fields
+                    // Reset UI
                     document.getElementById('check-alterada').checked = false;
                     App.controllers.toggleCheckAlterada();
                     document.getElementById('qtd-cesta').value = 1;
+                    document.getElementById('input-tirar').value = '';
+                    document.getElementById('input-por').value = '';
                     document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+                    // Reset dropdown visual
+                    document.getElementById('label-select-cesta').innerText = 'Selecione a Cesta...';
+                    document.getElementById('hidden-cesta-nome').value = '';
+                    document.getElementById('label-select-cesta').classList.remove('text-slate-900', 'font-medium');
                 },
 
-                removerItemCarrinho: (index) => {
-                    Store.data.carrinhoTemp.splice(index, 1);
-                    App.ui.renderCarrinho();
-                },
-
+                removerItemCarrinho: (index) => { Store.data.carrinhoTemp.splice(index, 1); App.ui.renderCarrinho(); },
                 salvarEntrega: () => {
                     const nome = document.getElementById('input-cliente').value.trim();
                     const regiaoInput = document.querySelector('input[name="regiao"]:checked');
-                    
                     if(!nome) return Utils.toast('Informe o nome do cliente', 'error');
                     if(!regiaoInput) return Utils.toast('Selecione a região', 'error');
                     if(Store.data.carrinhoTemp.length === 0) return Utils.toast('Adicione cestas ao pedido', 'error');
-
-                    // Buscar dados do cliente no DB ou criar novo
                     let clienteData = { nome: nome, endereco: '', celular: '' };
                     if (typeof CLIENTES_DB !== 'undefined') {
                         const found = CLIENTES_DB.find(c => c.nome.toLowerCase() === nome.toLowerCase());
                         if (found) clienteData = found;
                     }
-                    
                     const valorFinalManual = parseFloat(document.getElementById('input-valor-final').value) || 0;
-
-                    const novaEntrega = {
-                        id: Date.now(),
-                        cliente: clienteData,
-                        regiao: regiaoInput.value,
-                        cestas: [...Store.data.carrinhoTemp],
-                        valorTotalAjustado: valorFinalManual,
-                        observacao: document.getElementById('input-obs-geral').value,
-                        status: 'Pendente',
-                        updatedAt: new Date().toISOString(),
-                        formaPagamento: []
-                    };
-
+                    const novaEntrega = { id: Date.now(), cliente: clienteData, regiao: regiaoInput.value, cestas: [...Store.data.carrinhoTemp], valorTotalAjustado: valorFinalManual, observacao: document.getElementById('input-obs-geral').value, status: 'Pendente', updatedAt: new Date().toISOString(), formaPagamento: [] };
                     Store.addEntrega(novaEntrega);
                     App.ui.modalLancamento.close();
-                    Store.data.regiaoFiltro = regiaoInput.value; // Pula para a aba da região
+                    Store.data.regiaoFiltro = regiaoInput.value;
                     App.ui.render();
                     Utils.toast('Entrega lançada com sucesso!');
                 },
-
-                // --- Ações na Lista ---
                 moverEntrega: (id, dir) => Store.moverEntrega(id, dir),
-                
-                cancelarEntrega: (id) => {
-                    if(confirm('Cancelar esta entrega?')) {
-                        Store.updateEntrega(id, { status: 'Cancelada' });
-                        App.ui.render();
-                    }
-                },
-
-                abrirMapa: (endereco) => {
-                    if(!endereco || endereco.length < 3) return Utils.toast('Endereço não cadastrado', 'error');
-                    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`, '_blank');
-                },
-
-                // --- Pagamento ---
+                cancelarEntrega: (id) => { if(confirm('Cancelar esta entrega?')) { Store.updateEntrega(id, { status: 'Cancelada' }); App.ui.render(); } },
+                abrirMapa: (endereco) => { if(!endereco || endereco.length < 3) return Utils.toast('Endereço não cadastrado', 'error'); window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`, '_blank'); },
                 iniciarPagamento: (id) => {
                     Store.data.entregaEmAcaoId = id;
                     const entrega = Store.data.rotaAtiva.entregas.find(e => e.id == id);
                     document.getElementById('pag-cliente-nome').innerText = entrega.cliente.nome;
                     document.getElementById('pag-valor-total').innerText = Utils.formatMoeda(entrega.valorTotalAjustado);
-                    
                     document.querySelectorAll('input[name="pagamento"]').forEach(el => el.checked = false);
                     document.getElementById('modal-pagamento').classList.remove('hidden');
                 },
-
                 confirmarPagamento: () => {
                     const pags = Array.from(document.querySelectorAll('input[name="pagamento"]:checked')).map(el => el.value);
                     if(pags.length === 0) return Utils.toast('Selecione uma forma de pagamento', 'error');
-
-                    Store.updateEntrega(Store.data.entregaEmAcaoId, {
-                        status: 'Entregue',
-                        formaPagamento: pags
-                    });
-
+                    Store.updateEntrega(Store.data.entregaEmAcaoId, { status: 'Entregue', formaPagamento: pags });
                     document.getElementById('modal-pagamento').classList.add('hidden');
-                    
-                    // Enviar Relatório Rápido Zap
                     const entrega = Store.data.rotaAtiva.entregas.find(e => e.id == Store.data.entregaEmAcaoId);
                     App.controllers.enviarRelatorioFinalZap(entrega);
-                    
                     App.ui.render();
                     Utils.toast('Entrega concluída! 🎉');
                 },
-
-                // --- WhatsApp Integration ---
-                abrirZap: (id) => {
-                    Store.data.entregaEmAcaoId = id;
-                    document.getElementById('modal-whatsapp').classList.remove('hidden');
-                },
-                
-                // NOVO: Funções Pós Venda
-                abrirPosVenda: (id) => {
-                    Store.data.entregaEmAcaoId = id;
-                    const entrega = Store.data.rotaAtiva.entregas.find(e => e.id == id);
-                    if (!entrega) {
-                        return Utils.toast('Erro ao encontrar entrega', 'error');
-                    }
-                    
-                    // Caso o cliente tenha sido passado por link e ainda não tenha o elemento carregado, 
-                    // precisamos garantir que os dados estejam disponíveis.
-                    document.getElementById('pos-venda-cliente-nome').innerText = entrega.cliente.nome;
-                    document.getElementById('modal-pos-venda').classList.remove('hidden');
-                },
-
+                abrirZap: (id) => { Store.data.entregaEmAcaoId = id; document.getElementById('modal-whatsapp').classList.remove('hidden'); },
+                abrirPosVenda: (id) => { Store.data.entregaEmAcaoId = id; const entrega = Store.data.rotaAtiva.entregas.find(e => e.id == id); if (!entrega) return Utils.toast('Erro', 'error'); document.getElementById('pos-venda-cliente-nome').innerText = entrega.cliente.nome; document.getElementById('modal-pos-venda').classList.remove('hidden'); },
                 enviarPosVenda: (tipo) => {
                     const entrega = Store.data.rotaAtiva.entregas.find(e => e.id == Store.data.entregaEmAcaoId);
                     let num = entrega.cliente.celular.replace(/\D/g, '');
-                    if(!num) return Utils.toast('Cliente sem celular cadastrado', 'error');
+                    if(!num) return Utils.toast('Sem celular', 'error');
                     if(!num.startsWith('55')) num = '55' + num;
-
-                    let msg = '';
-                    const nome = entrega.cliente.nome.split(' ')[0]; // Primeiro nome
-
-                    switch(tipo) {
-                        case 1: // Agradecimento
-                            msg = `Olá ${nome}, tudo bem? Aqui é da Rota Dona Antonia. Muito obrigado pela sua compra! Deus abençoe você e sua família. 🙏`;
-                            break;
-                        case 2: // Cupom
-                            const hoje = new Date();
-                            hoje.setDate(hoje.getDate() + 30);
-                            const dataValidade = hoje.toLocaleDateString('pt-BR');
-                            msg = `Olá ${nome}! Como forma de agradecimento, você ganhou um *DESCONTO DE R$ 10,00* na sua próxima compra! 🎁\n\nCupom válido até dia *${dataValidade}*. Aproveite!`;
-                            break;
-                        case 3: // Google
-                            msg = `Olá ${nome}, poderia nos ajudar rapidinho? 🙏\n\nÉ só clicar no link abaixo e depois clicar nas 5 estrelas ⭐. Ajuda muito a gente!\n\n👉 https://g.page/r/CaIREJtO1L6WEBM/review\n\nDeus abençoe!`;
-                            break;
-                        case 4: // Instagram
-                            msg = `Olá ${nome}! Segue a gente no Instagram para ver as novidades e promoções! 📸\n\n👉 https://www.instagram.com/super.cestas.dona.antonia/`;
-                            break;
-                    }
-
+                    let msg = '', nome = entrega.cliente.nome.split(' ')[0];
+                    if(tipo===1) msg = `Olá ${nome}, tudo bem? Aqui é da Rota Dona Antonia. Muito obrigado pela sua compra! Deus abençoe você e sua família. 🙏`;
+                    else if(tipo===2) { const h = new Date(); h.setDate(h.getDate()+30); msg = `Olá ${nome}! Como agradecimento, você ganhou um *DESCONTO DE R$ 10,00* na sua próxima compra! 🎁 Válido até *${h.toLocaleDateString('pt-BR')}*.`; }
+                    else if(tipo===3) msg = `Olá ${nome}, poderia nos ajudar? 🙏 Clique no link e avalie com 5 estrelas ⭐: https://g.page/r/CaIREJtO1L6WEBM/review Deus abençoe!`;
+                    else if(tipo===4) msg = `Olá ${nome}! Segue a gente no Instagram! 📸 https://www.instagram.com/super.cestas.dona.antonia/`;
                     window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msg)}`, '_blank');
                     document.getElementById('modal-pos-venda').classList.add('hidden');
                 },
-
                 enviarMsgZap: (tipo) => {
                     const entrega = Store.data.rotaAtiva.entregas.find(e => e.id == Store.data.entregaEmAcaoId);
                     let num = entrega.cliente.celular.replace(/\D/g, '');
-                    if(!num) {
-                        if(tipo !== 4) return Utils.toast('Cliente sem celular cadastrado', 'error');
-                        else num = CONSTANTS.NUMERO_GERENTE;
-                    } else if(!num.startsWith('55')) {
-                        num = '55' + num;
-                    }
-
+                    if(!num) { if(tipo!==4) return Utils.toast('Sem celular', 'error'); else num = CONSTANTS.NUMERO_GERENTE; } else if(!num.startsWith('55')) num = '55' + num;
                     let msg = '';
-                    const valor = Utils.formatMoeda(entrega.valorTotalAjustado);
-
                     switch(tipo) {
                         case 1: msg = `Olá ${entrega.cliente.nome.split(' ')[0]}! Aqui é da Cesta Básica. Chegando em 10 minutos! 🚚`; break;
                         case 2: msg = `Olá! O entregador chegou no seu endereço.`; break;
-                        case 3: msg = `Dados PIX:\nCelular: ${CONSTANTS.PIX_CELULAR}\nNome: ${CONSTANTS.PIX_NOME}\nValor: ${valor}`; break;
-                        case 4: 
-                            num = CONSTANTS.NUMERO_GERENTE;
-                            msg = `*PEDIDO MONTADOR*\nRegião: ${entrega.regiao}\n`;
-                            entrega.cestas.forEach(c => {
-                                msg += `\n- ${c.qtd}x ${c.nome} ${c.tipo==='Alterada' ? `(ALT: ${c.codigoAlterada})` : ''} ${c.brindes.length ? `+${c.brindes}`:''}`;
-                            });
-                            break;
+                        case 3: msg = `Dados PIX:\nCelular: ${CONSTANTS.PIX_CELULAR}\nNome: ${CONSTANTS.PIX_NOME}\nValor: ${Utils.formatMoeda(entrega.valorTotalAjustado)}`; break;
+                        case 4: num=CONSTANTS.NUMERO_GERENTE; msg = `*PEDIDO MONTADOR*\nRegião: ${entrega.regiao}\n`; entrega.cestas.forEach(c => { msg += `\n- ${c.qtd}x ${c.nome} ${c.tipo==='Alterada' ? `(ALT: ${c.tirar}/${c.por})` : ''} ${c.brindes.length ? `+${c.brindes}`:''}`; }); break;
                     }
-
                     window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msg)}`, '_blank');
                     document.getElementById('modal-whatsapp').classList.add('hidden');
                 },
-
                 enviarRelatorioFinalZap: (entrega) => {
-                     // CORREÇÃO: Usar o novo número de confirmação de entrega
                      const num = CONSTANTS.NUMERO_CONFIRMACAO_ENTREGA; 
-                     
                      let msg = `*✅ ENTREGA REALIZADA*\nCliente: ${entrega.cliente.nome}\nValor: ${Utils.formatMoeda(entrega.valorTotalAjustado)}\nPagamento: ${entrega.formaPagamento.join(', ')}\n\n`;
-                     entrega.cestas.forEach(c => {
-                         msg += `${c.qtd}x ${c.nome}\n`;
-                     });
-                     
-                     // GERAÇÃO DO LINK DE PEDIDO
+                     entrega.cestas.forEach(c => { msg += `${c.qtd}x ${c.nome}\n`; });
                      const linkPedido = `${window.location.origin}${window.location.pathname}?pedidoId=${entrega.id}`;
                      msg += `\n🔗 Link Pós-Venda: ${linkPedido}`;
-                     
-                     // Pequeno delay para UX
-                     setTimeout(() => {
-                        if(confirm('Abrir WhatsApp para enviar comprovante de entrega?')) {
-                            window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msg)}`, '_blank');
-                        }
-                     }, 500);
+                     setTimeout(() => { if(confirm('Abrir WhatsApp para enviar comprovante?')) { window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msg)}`, '_blank'); } }, 500);
                 },
-                
-                // --- NOVO: Função para Gerar Relatório de Cestas ---
                 gerarRelatorioCestas: () => {
-                    const regioesSelecionadas = Array.from(document.querySelectorAll('#relatorio-regioes-list input:checked')).map(el => el.value);
-                    
-                    if(regioesSelecionadas.length === 0) return Utils.toast('Selecione ao menos uma região', 'error');
-                    
-                    // Filtra apenas as entregas Pendentes ou Todas? O pedido diz "cada pedido da rota", assumindo todos os ativos.
-                    // Vou incluir todos (pendentes e entregues) para conferência, filtrando pela região.
-                    const entregas = Store.data.rotaAtiva.entregas.filter(e => regioesSelecionadas.includes(e.regiao));
-                    
-                    if(entregas.length === 0) return Utils.toast('Nenhuma entrega encontrada nessas regiões', 'error');
-
+                    const regioes = Array.from(document.querySelectorAll('#relatorio-regioes-list input:checked')).map(el => el.value);
+                    if(regioes.length === 0) return Utils.toast('Selecione região', 'error');
+                    const entregas = Store.data.rotaAtiva.entregas.filter(e => regioes.includes(e.regiao));
+                    if(entregas.length === 0) return Utils.toast('Sem entregas', 'error');
                     let msg = `*📋 RELATÓRIO DE CESTAS*\nData: ${Utils.formatData(Store.data.rotaAtiva.dataCriacao)}\n`;
-                    
-                    // Ordena por região para ficar organizado
-                    regioesSelecionadas.forEach(regiao => {
-                        const itensRegiao = entregas.filter(e => e.regiao === regiao);
-                        if(itensRegiao.length > 0) {
-                            msg += `\n*📍 REGIÃO: ${regiao}*\n`;
-                            itensRegiao.forEach(entrega => {
-                                entrega.cestas.forEach(c => {
-                                    // Formato solicitado: Nome, Cesta, Alteração
-                                    let linha = `👤 ${entrega.cliente.nome}\n📦 ${c.qtd}x ${c.nome}`;
-                                    if(c.tipo === 'Alterada') {
-                                        linha += `\n⚠️ ALT: ${c.codigoAlterada}`;
-                                    }
-                                    msg += `${linha}\n------------------\n`;
-                                });
-                            });
+                    regioes.forEach(r => {
+                        const itens = entregas.filter(e => e.regiao === r);
+                        if(itens.length > 0) {
+                            msg += `\n*📍 REGIÃO: ${r}*\n`;
+                            itens.forEach(e => { e.cestas.forEach(c => { let linha = `👤 ${e.cliente.nome}\n📦 ${c.qtd}x ${c.nome}`; if(c.tipo === 'Alterada') linha += `\n⚠️ ALT: Tirar ${c.tirar} / Pôr ${c.por}`; msg += `${linha}\n------------------\n`; }); });
                         }
                     });
-
-                    // Abre WhatsApp
                     window.open(`https://api.whatsapp.com/send?phone=${CONSTANTS.NUMERO_RELATORIO}&text=${encodeURIComponent(msg)}`, '_blank');
                     App.ui.modalRelatorio.close();
                 },
-
-
-                // --- Backup System ---
                 baixarBackup: () => {
                     const regioes = Array.from(document.querySelectorAll('#export-regioes-list input:checked')).map(el => el.value);
-                    if(regioes.length === 0) return Utils.toast('Selecione ao menos uma região', 'error');
-
-                    const backup = {
-                        ...Store.data.rotaAtiva,
-                        entregas: Store.data.rotaAtiva.entregas.filter(e => regioes.includes(e.regiao))
-                    };
-
-                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
+                    if(regioes.length === 0) return Utils.toast('Selecione região', 'error');
+                    const backup = { ...Store.data.rotaAtiva, entregas: Store.data.rotaAtiva.entregas.filter(e => regioes.includes(e.regiao)) };
                     const link = document.createElement("a");
-                    link.setAttribute("href", dataStr);
+                    link.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup)));
                     link.setAttribute("download", `RotaBackup_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`);
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
+                    document.body.appendChild(link); link.click(); link.remove();
                     App.ui.modalExport.close();
                 },
-
                 importarBackup: (input) => {
                     const file = input.files[0];
                     if(!file) return;
@@ -1055,95 +713,96 @@
                     reader.onload = (e) => {
                         try {
                             const json = JSON.parse(e.target.result);
-                            if(json.entregas) {
-                                Store.data.rotaAtiva = json;
-                                Store.save();
-                                window.location.reload();
-                            } else {
-                                throw new Error('Formato inválido');
-                            }
-                        } catch(err) {
-                            Utils.toast('Erro ao ler arquivo: ' + err.message, 'error');
-                        }
+                            if(json.entregas) { Store.data.rotaAtiva = json; Store.save(); window.location.reload(); }
+                            else throw new Error('Inválido');
+                        } catch(err) { Utils.toast('Erro ao ler arquivo', 'error'); }
                     };
                     reader.readAsText(file);
                 }
             }
         };
 
-        // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
             Store.init();
             App.ui.render();
-
-            // Event Listeners Dinâmicos
             document.getElementById('check-alterada').addEventListener('change', App.controllers.toggleCheckAlterada);
-            
-            // Renderizar opções de Região no Modal de Lançamento
             const radioContainer = document.getElementById('container-radio-regiao');
-            radioContainer.innerHTML = CONSTANTS.REGIOES.map(r => `
-                <label class="cursor-pointer">
-                    <input type="radio" name="regiao" value="${r}" class="peer sr-only" ${r === 'VG' ? 'checked' : ''}>
-                    <div class="rounded-md border border-gray-200 bg-white p-2 text-center text-gray-600 peer-checked:border-brand-500 peer-checked:bg-brand-50 peer-checked:text-brand-700 transition-all font-semibold">
-                        ${r}
-                    </div>
-                </label>
-            `).join('');
+            radioContainer.innerHTML = CONSTANTS.REGIOES.map(r => `<label class="cursor-pointer"><input type="radio" name="regiao" value="${r}" class="peer sr-only" ${r === 'VG' ? 'checked' : ''}><div class="rounded-md border border-gray-200 bg-white p-2 text-center text-slate-600 peer-checked:border-slate-800 peer-checked:bg-slate-800 peer-checked:text-white transition-all font-semibold shadow-sm">${r}</div></label>`).join('');
             
-            // Datalist population
-            if(typeof CLIENTES_DB !== 'undefined') {
-                const dl = document.getElementById('lista-clientes-datalist');
-                CLIENTES_DB.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.nome;
-                    dl.appendChild(opt);
-                });
-
-                // Auto-preencher preview
-                document.getElementById('input-cliente').addEventListener('input', (e) => {
-                    const val = e.target.value;
-                    const found = CLIENTES_DB.find(c => c.nome.toLowerCase() === val.toLowerCase());
-                    const preview = document.getElementById('info-cliente-preview');
-                    if(found) {
-                        preview.innerHTML = `
-                            <strong>Nome:</strong> ${found.nome}<br>
-                            <strong>Tel:</strong> ${found.celular || '-'}<br>
-                            <strong>End:</strong> ${found.endereco || '-'}<br>
-                            <strong>Comp:</strong> ${found.complemento || '-'}
-                        `;
-                        preview.classList.remove('hidden');
+            // Lógica Dropdown Clientes
+            const inputCliente = document.getElementById('input-cliente');
+            const dropdownClientes = document.getElementById('dropdown-clientes');
+            
+            inputCliente.addEventListener('input', (e) => {
+                const val = e.target.value.toLowerCase();
+                const preview = document.getElementById('info-cliente-preview');
+                
+                // Filtra clientes
+                if(typeof CLIENTES_DB !== 'undefined' && val.length > 0) {
+                    const filtrados = CLIENTES_DB.filter(c => c.nome.toLowerCase().includes(val)).slice(0, 50); // Limite de 50
+                    if(filtrados.length > 0) {
+                        dropdownClientes.innerHTML = filtrados.map(c => 
+                            `<div class="p-3 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors" onclick="App.controllers.selecionarCliente('${c.nome}')">
+                                <p class="font-bold text-sm text-slate-800">${c.nome}</p>
+                                <p class="text-xs text-slate-500">${c.endereco || ''}</p>
+                            </div>`
+                        ).join('');
+                        App.controllers.abrirDropdownCliente();
                     } else {
-                        preview.classList.add('hidden');
+                        dropdownClientes.innerHTML = '<div class="p-3 text-sm text-slate-400">Nenhum cliente encontrado</div>';
+                        App.controllers.abrirDropdownCliente();
                     }
-                });
-            }
+                    
+                    // Preview exato
+                    const found = CLIENTES_DB.find(c => c.nome.toLowerCase() === val);
+                    if(found) {
+                        preview.innerHTML = `<strong>Nome:</strong> ${found.nome}<br><strong>Tel:</strong> ${found.celular || '-'}<br><strong>End:</strong> ${found.endereco || '-'}<br><strong>Comp:</strong> ${found.complemento || '-'}`;
+                        preview.classList.remove('hidden');
+                    } else { preview.classList.add('hidden'); }
 
-            // --- Lógica para Abrir Pedido via Link (Query Param) ---
+                } else {
+                    App.controllers.fecharDropdownCliente();
+                    preview.classList.add('hidden');
+                }
+            });
+
+            // Fecha dropdown ao clicar fora
+            document.addEventListener('click', (e) => {
+                if(!e.target.closest('.group')) App.controllers.fecharDropdownCliente();
+                if(!e.target.closest('#container-custom-select-cesta')) App.controllers.fecharDropdownCesta();
+            });
+
+            // Lógica Dropdown Cestas
+            const btnCesta = document.getElementById('btn-custom-select-cesta');
+            const dropdownCesta = document.getElementById('dropdown-cestas');
+            
+            // Popula opções uma vez
+            dropdownCesta.innerHTML = CONSTANTS.CESTAS_OPTIONS.map(opt => 
+                `<div class="p-3 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors" onclick="App.controllers.selecionarCesta('${opt.value}', '${opt.label}', ${opt.price})">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-sm text-slate-700">${opt.label}</span>
+                        <span class="text-xs font-bold text-blue-600">${opt.price > 0 ? Utils.formatMoeda(opt.price) : '-'}</span>
+                    </div>
+                </div>`
+            ).join('');
+
+            btnCesta.addEventListener('click', App.controllers.toggleDropdownCesta);
+
+            // Link Deep Linking
             const urlParams = new URLSearchParams(window.location.search);
             const pedidoId = urlParams.get('pedidoId');
             if(pedidoId) {
-                // Pequeno delay para garantir que a renderização inicial ocorra
                 setTimeout(() => {
                     const entrega = Store.data.rotaAtiva.entregas.find(e => e.id == pedidoId);
                     if(entrega) {
-                        // Se estiver em outra região, muda o filtro para exibir
-                        if(Store.data.regiaoFiltro !== entrega.regiao) {
-                            App.controllers.mudarFiltro(entrega.regiao);
-                        }
-                        
-                        // Abre o modal de pós-venda
+                        if(Store.data.regiaoFiltro !== entrega.regiao) App.controllers.mudarFiltro(entrega.regiao);
                         App.controllers.abrirPosVenda(pedidoId);
                         Utils.toast('Pedido carregado via link!', 'info');
-                        
-                        // (Opcional) Limpa a URL para não reabrir se der refresh
                         window.history.replaceState({}, document.title, window.location.pathname);
-                    } else {
-                        Utils.toast('Pedido do link não encontrado nesta rota.', 'error');
-                    }
+                    } else { Utils.toast('Pedido do link não encontrado.', 'error'); }
                 }, 500);
             }
         });
-
     </script>
 </body>
 </html>
