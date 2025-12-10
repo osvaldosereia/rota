@@ -137,7 +137,7 @@
         <div class="flex gap-2 overflow-x-auto pb-2 mb-4 no-scrollbar" id="filtros-regiao"></div>
 
         <!-- Botão Flutuante (FAB) para Lançamento -->
-        <button onclick="App.ui.modalLancamento.open()" class="fixed bottom-6 right-6 bg-slate-800 text-white rounded-full p-4 shadow-xl hover:bg-slate-900 transition-transform hover:scale-105 z-40 flex items-center justify-center">
+        <button onclick="App.controllers.iniciarNovoLancamento()" class="fixed bottom-6 right-6 bg-slate-800 text-white rounded-full p-4 shadow-xl hover:bg-slate-900 transition-transform hover:scale-105 z-40 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
         </button>
 
@@ -159,7 +159,7 @@
         <div class="absolute bottom-0 w-full h-[90vh] flex flex-col bg-white rounded-t-2xl shadow-2xl md:fixed md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl md:h-auto md:max-h-[90vh] md:rounded-xl modal-content">
             
             <div class="flex-none flex justify-between items-center p-4 border-b border-slate-100">
-                <h3 class="text-lg font-bold text-slate-800">Nova Entrega</h3>
+                <h3 class="text-lg font-bold text-slate-800" id="modal-lancamento-title">Nova Entrega</h3>
                 <button onclick="App.ui.modalLancamento.close()" class="text-slate-400 hover:text-slate-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
 
@@ -267,7 +267,7 @@
 
             <div class="flex-none p-4 border-t border-slate-100 bg-white md:rounded-b-xl flex gap-3">
                 <button onclick="App.ui.modalLancamento.close()" class="flex-1 py-3 text-slate-600 font-medium hover:bg-slate-50 rounded-lg transition-colors border border-slate-200">Cancelar</button>
-                <button onclick="App.controllers.salvarEntrega()" class="flex-[2] py-3 bg-slate-800 text-white font-bold rounded-lg shadow-lg hover:bg-slate-900 transition-colors">Confirmar Lançamento</button>
+                <button onclick="App.controllers.salvarEntrega()" class="flex-[2] py-3 bg-slate-800 text-white font-bold rounded-lg shadow-lg hover:bg-slate-900 transition-colors" id="btn-submit-lancamento">Confirmar Lançamento</button>
             </div>
         </div>
     </div>
@@ -442,7 +442,6 @@
             METADATA_KEY: "rotaflow_clientes_meta_db", // Guarda datas de ações (cupom, avaliacao)
             CESTAS_OPTIONS: [
                 { value: "ESPECIAL", label: "ESPECIAL", price: 0.00 },
-                { value: "Econômica", label: "Econômica", price: 85.00 },
                 { value: "Mini Bonini", label: "Mini Bonini", price: 165.00 },
                 { value: "Mini Koblenz", label: "Mini Koblenz", price: 170.00 },
                 { value: "Pequena Bonini", label: "Pequena Bonini", price: 215.00 },
@@ -455,7 +454,7 @@
         };
 
         const Store = {
-            data: { rotaAtiva: null, regiaoFiltro: 'VG', carrinhoTemp: [], entregaEmAcaoId: null, history: [], meta: {} },
+            data: { rotaAtiva: null, regiaoFiltro: 'VG', carrinhoTemp: [], entregaEmAcaoId: null, editingId: null, history: [], meta: {} },
             init() {
                 // Carrega Rota Atual
                 const saved = localStorage.getItem(CONSTANTS.STORAGE_KEY);
@@ -568,13 +567,6 @@
                 modalLancamento: {
                     open: () => {
                         document.getElementById('modal-lancamento').classList.remove('hidden');
-                        Store.data.carrinhoTemp = [];
-                        App.ui.renderCarrinho();
-                        document.getElementById('input-cliente').value = '';
-                        document.getElementById('info-cliente-preview').classList.add('hidden');
-                        document.getElementById('input-valor-final').value = '';
-                        App.controllers.fecharDropdownCliente();
-                        App.controllers.fecharDropdownCesta();
                     },
                     close: () => document.getElementById('modal-lancamento').classList.add('hidden')
                 },
@@ -654,7 +646,7 @@
                                 ${entrega.cliente.complemento ? `<div class="mb-4"><p class="text-base font-medium text-slate-700 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 inline-block leading-snug w-full">${entrega.cliente.complemento}</p></div>` : ''}
                                 <div class="mb-4 border-t border-b border-slate-100 py-1">${itensHtml}</div>
                                 ${entrega.observacao ? `<div class="mb-4 pt-2 border-t border-slate-100"><p class="text-sm text-red-600 font-bold flex items-start gap-1">⚠️ ${entrega.observacao}</p></div>` : ''}
-                                <div class="space-y-3"><div class="grid grid-cols-2 gap-3"><button onclick="App.controllers.abrirZap(${entrega.id})" class="py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 transition-colors uppercase tracking-wide">WhatsApp</button><button onclick="App.controllers.abrirMapa('${entrega.cliente.endereco}')" class="py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 transition-colors uppercase tracking-wide">Mapa</button></div><div class="grid grid-cols-3 gap-3"><a href="${entrega.cliente.celular ? 'tel:'+entrega.cliente.celular : '#'}" class="py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-center uppercase tracking-wide">Ligar</a>${isPendente ? `<button onclick="App.controllers.iniciarPagamento(${entrega.id})" class="col-span-1 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-900 shadow-sm transition-colors uppercase tracking-wide">Entregue</button><button onclick="App.controllers.cancelarEntrega(${entrega.id})" class="col-span-1 py-2.5 bg-white border border-red-100 text-red-500 text-xs font-bold rounded-lg hover:bg-red-50 transition-colors uppercase tracking-wide">Cancelar</button>` : (entrega.status === 'Entregue' ? `<button onclick="App.controllers.abrirPosVenda(${entrega.id})" class="col-span-2 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-900 shadow-sm transition-colors uppercase tracking-wide">Pós Venda</button>` : '')}</div>${isPendente ? `<div class="flex justify-center gap-6 mt-2 pt-2 border-t border-slate-50"><button onclick="App.controllers.moverEntrega(${entrega.id}, 'cima')" class="text-slate-300 hover:text-slate-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button><button onclick="App.controllers.moverEntrega(${entrega.id}, 'baixo')" class="text-slate-300 hover:text-slate-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button></div>` : ''}</div></div></div>`;
+                                <div class="space-y-3"><div class="grid grid-cols-3 gap-3"><button onclick="App.controllers.abrirZap(${entrega.id})" class="py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 transition-colors uppercase tracking-wide">WhatsApp</button><button onclick="App.controllers.abrirMapa('${entrega.cliente.endereco}')" class="py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 transition-colors uppercase tracking-wide">Mapa</button>${isPendente ? `<button onclick="App.controllers.editarEntrega(${entrega.id})" class="py-2.5 bg-white border border-amber-200 text-amber-600 text-xs font-bold rounded-lg hover:bg-amber-50 transition-colors uppercase tracking-wide">Editar</button>` : ''}</div><div class="grid grid-cols-3 gap-3"><a href="${entrega.cliente.celular ? 'tel:'+entrega.cliente.celular : '#'}" class="py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-center uppercase tracking-wide">Ligar</a>${isPendente ? `<button onclick="App.controllers.iniciarPagamento(${entrega.id})" class="col-span-1 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-900 shadow-sm transition-colors uppercase tracking-wide">Entregue</button><button onclick="App.controllers.cancelarEntrega(${entrega.id})" class="col-span-1 py-2.5 bg-white border border-red-100 text-red-500 text-xs font-bold rounded-lg hover:bg-red-50 transition-colors uppercase tracking-wide">Cancelar</button>` : (entrega.status === 'Entregue' ? `<button onclick="App.controllers.abrirPosVenda(${entrega.id})" class="col-span-2 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-900 shadow-sm transition-colors uppercase tracking-wide">Pós Venda</button>` : '')}</div>${isPendente ? `<div class="flex justify-center gap-6 mt-2 pt-2 border-t border-slate-50"><button onclick="App.controllers.moverEntrega(${entrega.id}, 'cima')" class="text-slate-300 hover:text-slate-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button><button onclick="App.controllers.moverEntrega(${entrega.id}, 'baixo')" class="text-slate-300 hover:text-slate-600 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button></div>` : ''}</div></div></div>`;
                     }).join('');
                 }
             },
@@ -714,24 +706,107 @@
                 },
 
                 removerItemCarrinho: (index) => { Store.data.carrinhoTemp.splice(index, 1); App.ui.renderCarrinho(); },
+                
+                // NOVO: Prepara o modal para um novo lançamento (Reset)
+                iniciarNovoLancamento: () => {
+                    Store.data.editingId = null;
+                    Store.data.carrinhoTemp = [];
+                    
+                    // Reset UI
+                    document.getElementById('modal-lancamento-title').innerText = "Nova Entrega";
+                    document.getElementById('btn-submit-lancamento').innerText = "Confirmar Lançamento";
+                    document.getElementById('btn-submit-lancamento').classList.remove('bg-amber-600', 'hover:bg-amber-700');
+                    document.getElementById('btn-submit-lancamento').classList.add('bg-slate-800', 'hover:bg-slate-900');
+                    
+                    document.getElementById('input-cliente').value = '';
+                    document.getElementById('info-cliente-preview').classList.add('hidden');
+                    document.getElementById('input-valor-final').value = '';
+                    document.getElementById('input-obs-geral').value = '';
+                    const regiaoPadrao = document.querySelector(`input[name="regiao"][value="VG"]`);
+                    if(regiaoPadrao) regiaoPadrao.checked = true;
+
+                    App.ui.renderCarrinho();
+                    App.controllers.fecharDropdownCliente();
+                    App.controllers.fecharDropdownCesta();
+                    App.ui.modalLancamento.open();
+                },
+
+                // NOVO: Prepara o modal para EDIÇÃO
+                editarEntrega: (id) => {
+                    const entrega = Store.data.rotaAtiva.entregas.find(e => e.id == id);
+                    if (!entrega) return Utils.toast('Entrega não encontrada', 'error');
+
+                    Store.data.editingId = id;
+                    Store.data.carrinhoTemp = JSON.parse(JSON.stringify(entrega.cestas)); // Cópia profunda
+
+                    // UI Setup
+                    document.getElementById('modal-lancamento-title').innerText = "Editar Entrega";
+                    document.getElementById('btn-submit-lancamento').innerText = "Salvar Alterações";
+                    document.getElementById('btn-submit-lancamento').classList.remove('bg-slate-800', 'hover:bg-slate-900');
+                    document.getElementById('btn-submit-lancamento').classList.add('bg-amber-600', 'hover:bg-amber-700');
+
+                    // Preencher Campos
+                    document.getElementById('input-cliente').value = entrega.cliente.nome;
+                    const event = new Event('input'); document.getElementById('input-cliente').dispatchEvent(event); // Trigger preview
+                    
+                    const radio = document.querySelector(`input[name="regiao"][value="${entrega.regiao}"]`);
+                    if(radio) radio.checked = true;
+
+                    document.getElementById('input-obs-geral').value = entrega.observacao || '';
+                    document.getElementById('input-valor-final').value = entrega.valorTotalAjustado || '';
+
+                    App.ui.renderCarrinho();
+                    App.ui.modalLancamento.open();
+                },
+
                 salvarEntrega: () => {
                     const nome = document.getElementById('input-cliente').value.trim();
                     const regiaoInput = document.querySelector('input[name="regiao"]:checked');
+                    
                     if(!nome) return Utils.toast('Informe o nome do cliente', 'error');
                     if(!regiaoInput) return Utils.toast('Selecione a região', 'error');
                     if(Store.data.carrinhoTemp.length === 0) return Utils.toast('Adicione cestas ao pedido', 'error');
+                    
                     let clienteData = { nome: nome, endereco: '', celular: '' };
                     if (typeof CLIENTES_DB !== 'undefined') {
                         const found = CLIENTES_DB.find(c => c.nome.toLowerCase() === nome.toLowerCase());
                         if (found) clienteData = found;
                     }
+                    
                     const valorFinalManual = parseFloat(document.getElementById('input-valor-final').value) || 0;
-                    const novaEntrega = { id: Date.now(), cliente: clienteData, regiao: regiaoInput.value, cestas: [...Store.data.carrinhoTemp], valorTotalAjustado: valorFinalManual, observacao: document.getElementById('input-obs-geral').value, status: 'Pendente', updatedAt: new Date().toISOString(), formaPagamento: [] };
-                    Store.addEntrega(novaEntrega);
+                    
+                    if (Store.data.editingId) {
+                        // MODO EDIÇÃO: Atualiza existente
+                        const updates = {
+                            cliente: clienteData,
+                            regiao: regiaoInput.value,
+                            cestas: [...Store.data.carrinhoTemp],
+                            valorTotalAjustado: valorFinalManual,
+                            observacao: document.getElementById('input-obs-geral').value,
+                            updatedAt: new Date().toISOString()
+                        };
+                        Store.updateEntrega(Store.data.editingId, updates);
+                        Utils.toast('Entrega atualizada com sucesso!');
+                    } else {
+                        // MODO CRIAÇÃO: Novo ID
+                        const novaEntrega = { 
+                            id: Date.now(), 
+                            cliente: clienteData, 
+                            regiao: regiaoInput.value, 
+                            cestas: [...Store.data.carrinhoTemp], 
+                            valorTotalAjustado: valorFinalManual, 
+                            observacao: document.getElementById('input-obs-geral').value, 
+                            status: 'Pendente', 
+                            updatedAt: new Date().toISOString(), 
+                            formaPagamento: [] 
+                        };
+                        Store.addEntrega(novaEntrega);
+                        Utils.toast('Entrega lançada com sucesso!');
+                    }
+
                     App.ui.modalLancamento.close();
                     Store.data.regiaoFiltro = regiaoInput.value;
                     App.ui.render();
-                    Utils.toast('Entrega lançada com sucesso!');
                 },
                 moverEntrega: (id, dir) => Store.moverEntrega(id, dir),
                 cancelarEntrega: (id) => { if(confirm('Cancelar esta entrega?')) { Store.updateEntrega(id, { status: 'Cancelada' }); App.ui.render(); } },
