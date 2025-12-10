@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Arquivo de Clientes Externo -->
     <script src="clientes.js"></script>
@@ -109,7 +109,7 @@
     <main class="container mx-auto max-w-5xl px-4 py-6">
         
         <!-- KPIs / Placar -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="kpi-container">
+        <div class="w-full mb-6" id="kpi-container">
             <!-- Injetado via JS -->
         </div>
 
@@ -371,6 +371,7 @@
             PIX_CELULAR: "65984491018",
             NUMERO_GERENTE: "5565996884599",
             NUMERO_RELATORIO: "5565998150975",
+            NUMERO_CONFIRMACAO_ENTREGA: "5565998150975", // Novo número para confirmação
             REGIOES: ["VG", "CUIABA", "COXIPO", "CPA"],
             STORAGE_KEY: "rotaflow_v2_db"
         };
@@ -581,22 +582,33 @@
 
                     // KPIs
                     const totalGeral = Store.data.rotaAtiva.entregas.length;
-                    const pendentesGeral = Store.data.rotaAtiva.entregas.filter(e => e.status === 'Pendente').length;
-                    const entreguesGeral = Store.data.rotaAtiva.entregas.filter(e => e.status === 'Entregue');
-                    const receita = entreguesGeral.reduce((acc, e) => acc + (parseFloat(e.valorTotalAjustado || 0)), 0);
+                    const entreguesGeral = Store.data.rotaAtiva.entregas.filter(e => e.status === 'Entregue').length;
+                    
+                    // Lógica de Emojis e Frases
+                    let percentual = totalGeral > 0 ? (entreguesGeral / totalGeral) * 100 : 0;
+                    let emoji = '😴';
+                    let frase = 'Vamos começar?';
+                    let corBarra = 'bg-gray-200';
+
+                    if (percentual > 0 && percentual <= 25) { emoji = '🐢'; frase = 'Ritmo de tartaruga...'; corBarra = 'bg-red-400'; }
+                    else if (percentual > 25 && percentual <= 50) { emoji = '🚶'; frase = 'Caminhando...'; corBarra = 'bg-orange-400'; }
+                    else if (percentual > 50 && percentual <= 75) { emoji = '🏃'; frase = 'Acelerando!'; corBarra = 'bg-blue-400'; }
+                    else if (percentual > 75 && percentual < 100) { emoji = '🔥'; frase = 'Quase lá!'; corBarra = 'bg-indigo-500'; }
+                    else if (percentual === 100 && totalGeral > 0) { emoji = '🚀'; frase = 'Missão Cumprida!'; corBarra = 'bg-green-500'; }
 
                     document.getElementById('kpi-container').innerHTML = `
-                        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
-                            <p class="text-xs text-gray-500 uppercase font-bold">Pendentes</p>
-                            <p class="text-2xl font-bold text-blue-600">${pendentesGeral}</p>
-                        </div>
-                        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
-                            <p class="text-xs text-gray-500 uppercase font-bold">Entregues</p>
-                            <p class="text-2xl font-bold text-green-600">${entreguesGeral.length}</p>
-                        </div>
-                        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 col-span-2">
-                            <p class="text-xs text-gray-500 uppercase font-bold">Receita (Pix/Din/Cartão)</p>
-                            <p class="text-2xl font-bold text-gray-800">${Utils.formatMoeda(receita)}</p>
+                        <div class="bg-white p-4 rounded-xl shadow-md border border-gray-100 flex items-center justify-between">
+                            <div class="flex-1">
+                                <p class="text-gray-500 text-sm font-bold uppercase mb-1">${frase}</p>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-4xl font-black text-gray-800">${entreguesGeral}</span>
+                                    <span class="text-lg text-gray-400 font-medium">de ${totalGeral}</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2.5 mt-2">
+                                    <div class="${corBarra} h-2.5 rounded-full transition-all duration-500" style="width: ${percentual}%"></div>
+                                </div>
+                            </div>
+                            <div class="text-5xl ml-4 animate-bounce filter drop-shadow-sm">${emoji}</div>
                         </div>
                     `;
 
@@ -633,7 +645,7 @@
                         ).join(', ');
 
                         return `
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative transition-transform transform ${isPendente ? 'hover:scale-[1.01]' : 'opacity-70 bg-gray-50'}">
+                        <div class="bg-white rounded-xl shadow-md border-2 border-gray-100 overflow-hidden relative transition-transform transform ${isPendente ? 'hover:scale-[1.01] hover:border-blue-300' : 'opacity-80 bg-gray-50'} p-1">
                             ${!isPendente ? `
                                 <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
                                     <div class="bg-white/90 border-2 ${entrega.status === 'Entregue' ? 'border-green-500 text-green-600' : 'border-red-500 text-red-600'} px-4 py-1 rounded-lg text-xl font-black uppercase rotate-[-12deg] shadow-lg">
@@ -642,45 +654,59 @@
                                 </div>
                             ` : ''}
                             
-                            <div class="p-4 flex gap-3">
+                            <div class="p-5 flex flex-col md:flex-row gap-4">
                                 <!-- Coluna Controle -->
-                                <div class="flex flex-col gap-1 pt-1 justify-start">
-                                    <button ${!isPendente ? 'disabled' : ''} onclick="App.controllers.moverEntrega(${entrega.id}, 'cima')" class="p-1 text-gray-300 hover:text-brand-600 disabled:opacity-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
-                                    <button ${!isPendente ? 'disabled' : ''} onclick="App.controllers.moverEntrega(${entrega.id}, 'baixo')" class="p-1 text-gray-300 hover:text-brand-600 disabled:opacity-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+                                <div class="flex flex-row md:flex-col gap-2 justify-center items-center md:border-r border-gray-100 md:pr-3">
+                                    <button ${!isPendente ? 'disabled' : ''} onclick="App.controllers.moverEntrega(${entrega.id}, 'cima')" class="p-2 bg-gray-100 rounded-full text-gray-400 hover:text-brand-600 hover:bg-blue-50 disabled:opacity-0 transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
+                                    <button ${!isPendente ? 'disabled' : ''} onclick="App.controllers.moverEntrega(${entrega.id}, 'baixo')" class="p-2 bg-gray-100 rounded-full text-gray-400 hover:text-brand-600 hover:bg-blue-50 disabled:opacity-0 transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
                                 </div>
 
                                 <!-- Coluna Info -->
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex justify-between items-start">
-                                        <h4 class="font-bold text-gray-900 truncate pr-2">${entrega.cliente.nome}</h4>
-                                        <span class="font-bold text-brand-700 whitespace-nowrap">${Utils.formatMoeda(total)}</span>
-                                    </div>
-                                    <p class="text-sm text-gray-500 truncate mb-1">${entrega.cliente.endereco || 'Sem endereço'}</p>
-                                    
-                                    <div class="bg-blue-50 text-blue-800 text-xs p-2 rounded mb-2 font-medium">
-                                        📦 ${resumoItens}
-                                        ${entrega.observacao ? `<br><span class="text-red-500 font-bold">OBS: ${entrega.observacao}</span>` : ''}
+                                <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h4 class="text-xl font-extrabold text-gray-900 truncate pr-2">${entrega.cliente.nome}</h4>
+                                            <span class="text-lg font-bold text-brand-700 whitespace-nowrap bg-blue-50 px-2 py-1 rounded-lg border border-blue-100">${Utils.formatMoeda(total)}</span>
+                                        </div>
+                                        
+                                        <div class="mb-3 space-y-1">
+                                            <p class="text-base text-gray-700 flex items-start gap-1">
+                                                <svg class="w-4 h-4 mt-1 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                <span>${entrega.cliente.endereco || 'Sem endereço'}</span>
+                                            </p>
+                                            ${entrega.cliente.complemento ? `<p class="text-lg font-bold text-blue-800 ml-5 bg-blue-50 inline-block px-2 rounded border border-blue-200">Comp: ${entrega.cliente.complemento}</p>` : ''}
+                                            <p class="text-sm text-gray-600 ml-5 flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                                ${entrega.cliente.celular || 'Sem telefone'}
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="bg-amber-50 text-amber-900 text-sm p-3 rounded-lg border border-amber-100 mb-3 font-medium shadow-sm">
+                                            📦 ${resumoItens}
+                                            ${entrega.observacao ? `<div class="mt-1 pt-1 border-t border-amber-200 text-red-600 font-bold">OBS: ${entrega.observacao}</div>` : ''}
+                                        </div>
                                     </div>
 
-                                    ${entrega.status === 'Entregue' ? `<p class="text-xs text-green-700 font-medium text-right mb-2">Pago via: ${entrega.formaPagamento.join(', ')} às ${Utils.formatHora(entrega.updatedAt)}</p>` : ''}
+                                    ${entrega.status === 'Entregue' ? `<p class="text-xs text-green-700 font-medium text-right mb-2 bg-green-50 p-1 rounded inline-block self-end">Pago via: ${entrega.formaPagamento.join(', ')} às ${Utils.formatHora(entrega.updatedAt)}</p>` : ''}
 
                                     <!-- Ações -->
-                                    <div class="flex gap-2 mt-2">
-                                        <button onclick="App.controllers.abrirZap(${entrega.id})" class="flex-1 bg-green-100 text-green-700 py-2 rounded-lg text-sm font-semibold hover:bg-green-200 flex items-center justify-center gap-1">
-                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.017-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg> Zap
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-auto">
+                                        <button onclick="App.controllers.abrirZap(${entrega.id})" class="bg-green-100 text-green-700 py-3 rounded-lg text-sm font-bold hover:bg-green-200 flex items-center justify-center gap-1 border border-green-200 transition-colors">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.017-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg> ZAP
                                         </button>
-                                        <button onclick="App.controllers.abrirMapa('${entrega.cliente.endereco}')" class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200">Mapa</button>
+                                        <button onclick="App.controllers.abrirMapa('${entrega.cliente.endereco}')" class="bg-gray-100 text-gray-700 py-3 rounded-lg text-sm font-bold hover:bg-gray-200 border border-gray-200 transition-colors">MAPA</button>
                                         
                                         ${isPendente ? `
-                                            <button onclick="App.controllers.iniciarPagamento(${entrega.id})" class="flex-[2] bg-brand-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-brand-700 shadow-sm shadow-blue-200">ENTREGAR</button>
-                                            <button onclick="App.controllers.cancelarEntrega(${entrega.id})" class="px-3 text-red-400 hover:bg-red-50 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                                            <button onclick="App.controllers.iniciarPagamento(${entrega.id})" class="col-span-2 bg-brand-600 text-white py-3 rounded-lg text-sm font-bold hover:bg-brand-700 shadow-md shadow-blue-200 hover:shadow-lg transition-all transform hover:-translate-y-0.5">ENTREGAR</button>
+                                            <button onclick="App.controllers.cancelarEntrega(${entrega.id})" class="hidden"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
                                         ` : (entrega.status === 'Entregue' ? `
-                                            <button onclick="App.controllers.abrirPosVenda(${entrega.id})" class="flex-[2] bg-purple-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-purple-700 shadow-sm flex items-center justify-center gap-1">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                Pós Venda
+                                            <button onclick="App.controllers.abrirPosVenda(${entrega.id})" class="col-span-2 bg-purple-600 text-white py-3 rounded-lg text-sm font-bold hover:bg-purple-700 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                PÓS VENDA
                                             </button>
                                         ` : '')}
                                     </div>
+                                    ${isPendente ? `<div class="mt-2 text-center"><button onclick="App.controllers.cancelarEntrega(${entrega.id})" class="text-xs text-red-400 hover:text-red-600 underline">Cancelar Entrega</button></div>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -906,7 +932,9 @@
                 },
 
                 enviarRelatorioFinalZap: (entrega) => {
-                     const num = CONSTANTS.NUMERO_GERENTE; // Ou PIX_CELULAR conforme lógica original
+                     // CORREÇÃO: Usar o novo número de confirmação de entrega
+                     const num = CONSTANTS.NUMERO_CONFIRMACAO_ENTREGA; 
+                     
                      let msg = `*✅ ENTREGA REALIZADA*\nCliente: ${entrega.cliente.nome}\nValor: ${Utils.formatMoeda(entrega.valorTotalAjustado)}\nPagamento: ${entrega.formaPagamento.join(', ')}\n\n`;
                      entrega.cestas.forEach(c => {
                          msg += `${c.qtd}x ${c.nome}\n`;
@@ -918,7 +946,7 @@
                      
                      // Pequeno delay para UX
                      setTimeout(() => {
-                        if(confirm('Abrir WhatsApp para enviar comprovante ao gerente?')) {
+                        if(confirm('Abrir WhatsApp para enviar comprovante de entrega?')) {
                             window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msg)}`, '_blank');
                         }
                      }, 500);
