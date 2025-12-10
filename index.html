@@ -335,13 +335,20 @@
     <!-- Modal Exportar -->
     <div id="modal-exportar" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 p-4 no-print">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
-            <h3 class="text-xl font-bold text-slate-800 mb-4">Exportar Rota</h3>
-            <div class="space-y-2 mb-4">
-                <p class="text-sm text-slate-500 mb-2">Selecione as regiões:</p>
-                <div class="grid grid-cols-2 gap-2" id="export-regioes-list"></div>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">Exportar Backup</h3>
+            
+            <button onclick="App.controllers.baixarBackup('completo')" class="w-full bg-slate-800 text-white py-4 rounded-lg font-bold hover:bg-slate-900 shadow-lg transition-transform hover:scale-105 flex items-center justify-center gap-2 mb-6">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                Backup Completo (Tudo)
+            </button>
+
+            <div class="border-t border-slate-100 pt-4">
+                <p class="text-sm text-slate-500 mb-2 font-medium">Ou exportar apenas rota de hoje:</p>
+                <div class="grid grid-cols-2 gap-2 mb-3" id="export-regioes-list"></div>
+                <button onclick="App.controllers.baixarBackup('parcial')" class="w-full bg-blue-50 text-blue-700 py-2 rounded-lg font-bold hover:bg-blue-100 transition-colors text-sm">Baixar Apenas Rota Selecionada</button>
             </div>
-            <button onclick="App.controllers.baixarBackup()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 shadow-md transition-colors">Baixar JSON</button>
-            <button onclick="App.ui.modalExport.close()" class="w-full mt-2 text-slate-500 py-2 hover:bg-slate-100 rounded-lg transition-colors">Cancelar</button>
+
+            <button onclick="App.ui.modalExport.close()" class="w-full mt-4 text-slate-500 py-2 hover:bg-slate-50 rounded-lg transition-colors">Cancelar</button>
         </div>
     </div>
 
@@ -390,7 +397,7 @@
             <div class="flex-1 overflow-auto bg-slate-100 p-4">
                 <div class="bg-white rounded shadow">
                     <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-800 text-white text-sm sticky top-0">
+                        <thead class="bg-slate-800 text-white text-sm sticky top-0 z-10">
                             <tr>
                                 <th class="p-3">Cliente</th>
                                 <th class="p-3">Últimas 3 Compras</th>
@@ -398,7 +405,7 @@
                                 <th class="p-3">Últimos Pagamentos</th>
                                 <th class="p-3">Rota Frequente</th>
                                 <th class="p-3 text-right">Total Gasto</th>
-                                <th class="p-3 text-center no-print">Ações</th>
+                                <th class="p-3 text-center no-print w-32">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="crm-table-body" class="text-sm text-slate-700 divide-y divide-slate-100">
@@ -840,13 +847,32 @@
                     window.open(`https://api.whatsapp.com/send?phone=${CONSTANTS.NUMERO_RELATORIO}&text=${encodeURIComponent(msg)}`, '_blank');
                     App.ui.modalRelatorio.close();
                 },
-                baixarBackup: () => {
-                    const regioes = Array.from(document.querySelectorAll('#export-regioes-list input:checked')).map(el => el.value);
-                    if(regioes.length === 0) return Utils.toast('Selecione região', 'error');
-                    const backup = { ...Store.data.rotaAtiva, entregas: Store.data.rotaAtiva.entregas.filter(e => regioes.includes(e.regiao)) };
+                baixarBackup: (tipo) => {
+                    let backup;
+                    let filename;
+
+                    if (tipo === 'completo') {
+                        // EXPORTA TUDO (Rota + Histórico + Meta)
+                        backup = { 
+                            fullDump: true,
+                            timestamp: new Date().toISOString(),
+                            rotaAtiva: Store.data.rotaAtiva,
+                            history: Store.data.history,
+                            meta: Store.data.meta,
+                            version: '2.0'
+                        };
+                        filename = `Backup_COMPLETO_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+                    } else {
+                        // Exporta apenas Rota (Lógica Original)
+                        const regioes = Array.from(document.querySelectorAll('#export-regioes-list input:checked')).map(el => el.value);
+                        if(regioes.length === 0) return Utils.toast('Selecione região', 'error');
+                        backup = { ...Store.data.rotaAtiva, entregas: Store.data.rotaAtiva.entregas.filter(e => regioes.includes(e.regiao)) };
+                        filename = `Rota_Parcial_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+                    }
+
                     const link = document.createElement("a");
                     link.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup)));
-                    link.setAttribute("download", `RotaBackup_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`);
+                    link.setAttribute("download", filename);
                     document.body.appendChild(link); link.click(); link.remove();
                     App.ui.modalExport.close();
                 },
@@ -857,8 +883,28 @@
                     reader.onload = (e) => {
                         try {
                             const json = JSON.parse(e.target.result);
-                            if(json.entregas) { Store.data.rotaAtiva = json; Store.save(); window.location.reload(); }
-                            else throw new Error('Inválido');
+                            
+                            // Verifica se é um Backup Completo
+                            if(json.fullDump) {
+                                if(confirm('⚠️ ATENÇÃO: Isso irá substituir TODO o histórico, rotas e dados de clientes pelos do arquivo. Continuar?')) {
+                                    Store.data.rotaAtiva = json.rotaAtiva || Store.novaRota();
+                                    Store.data.history = json.history || [];
+                                    Store.data.meta = json.meta || {};
+                                    Store.save();
+                                    Store.saveHistory();
+                                    Store.saveMeta();
+                                    alert('Backup Completo restaurado com sucesso!');
+                                    window.location.reload();
+                                }
+                            }
+                            // Verifica se é Backup de Rota Antigo
+                            else if(json.entregas) { 
+                                Store.data.rotaAtiva = json; 
+                                Store.save(); 
+                                Utils.toast('Rota importada com sucesso!');
+                                window.location.reload(); 
+                            }
+                            else { throw new Error('Formato inválido'); }
                         } catch(err) { Utils.toast('Erro ao ler arquivo', 'error'); }
                     };
                     reader.readAsText(file);
@@ -869,6 +915,10 @@
                 crmSearch: () => {
                     const term = document.getElementById('crm-search').value.toLowerCase();
                     App.controllers.renderCRMTable(App.controllers.crmClientsCache.filter(c => c.nome.toLowerCase().includes(term)));
+                },
+                toggleCrmActions: (id) => {
+                   const el = document.getElementById(id);
+                   if (el.classList.contains('hidden')) el.classList.remove('hidden'); else el.classList.add('hidden');
                 },
                 crmFilter: (type) => {
                     // Processar dados brutos do histórico para criar perfil de cliente
@@ -912,13 +962,17 @@
                     const tbody = document.getElementById('crm-table-body');
                     if(clients.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">Nenhum cliente encontrado com este filtro.</td></tr>'; return; }
                     
-                    tbody.innerHTML = clients.map(c => {
+                    tbody.innerHTML = clients.map((c, idx) => {
                         // Pegar ultimos 3
                         const last3 = c.orders.slice(0, 3);
                         const dates = last3.map(o => Utils.formatDataCurta(o.updatedAt)).join('<br>');
                         const cestas = last3.map(o => o.cestas.map(x => x.nome).join(', ')).join('<br>');
                         const pays = last3.map(o => o.formaPagamento.join(', ')).join('<br>');
                         
+                        // Cálculo de dias para vencimento (Assumindo ciclo de 30 dias)
+                        const diasRestantes = 30 - c.daysSince;
+                        const labelVencimento = diasRestantes > 0 ? `${diasRestantes} dias` : 'Hoje';
+
                         return `
                         <tr class="hover:bg-slate-50 border-b border-slate-100">
                             <td class="p-3">
@@ -931,20 +985,42 @@
                             <td class="p-3 text-xs text-slate-600">${pays}</td>
                             <td class="p-3 text-xs font-semibold">${c.lastRota}</td>
                             <td class="p-3 text-right font-bold text-slate-700">${Utils.formatMoeda(c.totalValue)}</td>
-                            <td class="p-3 text-center space-y-1 no-print">
-                                ${c.couponExpiring ? `<button onclick="App.controllers.avisarZap('${c.celular}', 'vencendo')" class="block w-full text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200">Avisar Cupom</button>` : ''}
-                                <button onclick="App.controllers.avisarZap('${c.celular}', 'oferta')" class="block w-full text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200">Enviar Oferta</button>
+                            <td class="p-3 text-center no-print align-top relative">
+                                <button onclick="App.controllers.toggleCrmActions('crm-actions-${idx}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1 px-3 rounded text-xs border border-slate-300">
+                                    ⚡ Opções
+                                </button>
+                                <div id="crm-actions-${idx}" class="hidden absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-xl z-20 text-left overflow-hidden">
+                                    <button onclick="App.controllers.avisarZap('${c.celular}', 'vencimento_custom', ${diasRestantes})" class="w-full text-left px-4 py-3 hover:bg-yellow-50 text-xs font-bold text-yellow-700 border-b border-slate-100">
+                                        🎫 Cupom (Vence ${labelVencimento})
+                                    </button>
+                                    <button onclick="App.controllers.avisarZap('${c.celular}', 'oferta')" class="w-full text-left px-4 py-3 hover:bg-blue-50 text-xs font-bold text-blue-700 border-b border-slate-100">
+                                        🔥 Avisar Oferta
+                                    </button>
+                                    <button onclick="App.controllers.avisarZap('${c.celular}', 'sorteio')" class="w-full text-left px-4 py-3 hover:bg-green-50 text-xs font-bold text-green-700">
+                                        🍀 Avisar Sorteio
+                                    </button>
+                                </div>
                             </td>
                         </tr>`;
                     }).join('');
                 },
-                avisarZap: (celular, tipo) => {
+                avisarZap: (celular, tipo, diasRestantes = 0) => {
                     if(!celular) return Utils.toast('Cliente sem celular', 'error');
                     let num = celular.replace(/\D/g, '');
                     if(!num.startsWith('55')) num = '55' + num;
                     let msg = "";
+                    
                     if(tipo === 'vencendo') msg = "Olá! Seu cupom de desconto especial está quase vencendo (faltam 3 dias)! Aproveite para fazer seu pedido hoje.";
-                    else msg = "Olá! Temos ofertas especiais para você hoje. Gostaria de conferir?";
+                    
+                    else if(tipo === 'vencimento_custom') {
+                        if(diasRestantes > 0) msg = `Olá! Passando para avisar que seu cupom de desconto vence em apenas *${diasRestantes} dias*! 🏃‍♂️ Aproveite para garantir sua cesta hoje.`;
+                        else msg = `Olá! Seu cupom de desconto vence *HOJE*! 🚨 Não perca essa oportunidade.`;
+                    }
+                    
+                    else if(tipo === 'oferta') msg = "Olá! 🌟 Temos uma *OFERTA RELÂMPAGO* especial para você hoje! Gostaria de conferir os itens em promoção?";
+                    
+                    else if(tipo === 'sorteio') msg = "Olá! 🍀 Estamos realizando um *SORTEIO* exclusivo para clientes fiéis! Responda essa mensagem para participar!";
+                    
                     window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msg)}`, '_blank');
                 }
             }
@@ -977,6 +1053,10 @@
             document.addEventListener('click', (e) => {
                 if(!e.target.closest('.group')) App.controllers.fecharDropdownCliente();
                 if(!e.target.closest('#container-custom-select-cesta')) App.controllers.fecharDropdownCesta();
+                // Fecha CRM Actions se clicar fora
+                if(!e.target.closest('td.relative')) {
+                    document.querySelectorAll('[id^="crm-actions-"]').forEach(el => el.classList.add('hidden'));
+                }
             });
 
             const btnCesta = document.getElementById('btn-custom-select-cesta');
