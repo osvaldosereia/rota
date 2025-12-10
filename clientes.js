@@ -7,6 +7,20 @@ const CLIENTES_DB = [
     "complemento": "Rua 14 quadra 20  casa 01 Jardim Dos Estados VG"
   },
   {
+  "id": "1765362652993-FUJKZ",
+  "nome": "Moises Feltrin",
+  "celular": "65 9972-7400",
+  "endereco": "Moises Feltrin",
+  "complemento": "Igreja Adventista da Morada do Ouro\nRua Dra  Celestina Botelho numero 143 ao lado da igreja Batista peniel segurança Éder cel 996364569"
+},
+  {
+  "id": "1765362353897-NXHKZ",
+  "nome": "Leila",
+  "celular": "6593229559",
+  "endereco": "Leila",
+  "complemento": "rua cajarana \nnúmero 368 \nbairro Jardim gramado \ncoxipo"
+},
+  {
   "id": "1765362154650-4ZOYM",
   "nome": "Creusa Ortiz",
   "celular": "65996328499",
