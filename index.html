@@ -72,6 +72,7 @@
             }
             #modal-historico { position: static; background: white; }
             .overflow-y-auto { overflow: visible !important; height: auto !important; }
+            #crm-summary-bar { background: #f1f5f9 !important; color: black !important; border: 1px solid #ccc; }
         }
     </style>
 </head>
@@ -384,13 +385,20 @@
             <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-3 items-center no-print">
                 <div class="flex items-center gap-2 bg-white px-3 py-2 rounded border">
                     <span class="text-xs text-slate-500 font-bold uppercase">Filtros Rápidos:</span>
-                    <button onclick="App.controllers.crmFilter('vencendo')" class="px-3 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-800 hover:bg-yellow-200">🎫 Cupom Vencendo (3d)</button>
-                    <button onclick="App.controllers.crmFilter('inativo40')" class="px-3 py-1 text-xs font-bold rounded bg-orange-100 text-orange-800 hover:bg-orange-200">💤 40 Dias s/ compra</button>
-                    <button onclick="App.controllers.crmFilter('inativo60')" class="px-3 py-1 text-xs font-bold rounded bg-red-100 text-red-800 hover:bg-red-200">☠️ 60 Dias s/ compra</button>
-                    <button onclick="App.controllers.crmFilter('todos')" class="px-3 py-1 text-xs font-bold rounded bg-blue-100 text-blue-800 hover:bg-blue-200">Todos</button>
+                    <button onclick="App.controllers.crmFilter('recent')" class="px-3 py-1 text-xs font-bold rounded bg-green-100 text-green-800 hover:bg-green-200">📅 Últimos 3 dias</button>
+                    <button onclick="App.controllers.crmFilter('vencendo')" class="px-3 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-800 hover:bg-yellow-200">🎫 Cupom Vencendo</button>
+                    <button onclick="App.controllers.crmFilter('inativo40')" class="px-3 py-1 text-xs font-bold rounded bg-orange-100 text-orange-800 hover:bg-orange-200">💤 Inativo (40d)</button>
+                    <button onclick="App.controllers.crmFilter('todos')" class="px-3 py-1 text-xs font-bold rounded bg-blue-100 text-blue-800 hover:bg-blue-200">📂 Carregar Histórico Completo</button>
                 </div>
                 <div class="flex-1"></div>
                 <input type="text" id="crm-search" placeholder="Buscar cliente..." class="px-3 py-2 border rounded text-sm w-48" onkeyup="App.controllers.crmSearch()">
+            </div>
+            
+            <!-- Resumo Discreto de Vendas (NOVO) -->
+            <div id="crm-summary-bar" class="bg-slate-800 text-white px-4 py-2 text-xs flex flex-wrap items-center gap-4 border-b border-slate-700 shadow-inner">
+                <div class="font-bold flex items-center gap-2"><span class="text-slate-400 uppercase">Total Vendas:</span> <span id="summary-count" class="text-white text-sm">0</span></div>
+                <div class="font-bold flex items-center gap-2 border-l border-slate-600 pl-4"><span class="text-slate-400 uppercase">Valor Total:</span> <span id="summary-value" class="text-green-400 text-sm">R$ 0,00</span></div>
+                <div class="flex-1 border-l border-slate-600 pl-4 overflow-hidden"><span class="text-slate-400 uppercase mr-2">Cestas:</span> <span id="summary-baskets" class="text-slate-300 italic">Carregando...</span></div>
             </div>
 
             <!-- Tabela de Dados -->
@@ -482,13 +490,22 @@
                 // Remove duplicatas se houver
                 this.data.history = this.data.history.filter(h => h.id !== entrega.id);
                 this.data.history.push(entrega);
-                
                 // Limpa histórico muito antigo (> 12 meses)
                 const oneYearAgo = new Date();
                 oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
                 this.data.history = this.data.history.filter(h => new Date(h.updatedAt) > oneYearAgo);
-                
                 this.saveHistory();
+            },
+            // NOVO: Remove histórico de um cliente
+            removeFromHistory(clienteNome) {
+                if(!clienteNome) return;
+                const initialCount = this.data.history.length;
+                this.data.history = this.data.history.filter(h => h.cliente.nome !== clienteNome);
+                if(this.data.history.length < initialCount) {
+                    this.saveHistory();
+                    return true;
+                }
+                return false;
             },
             updateMeta(clienteNome, field, value) {
                 if(!this.data.meta[clienteNome]) this.data.meta[clienteNome] = {};
@@ -581,7 +598,7 @@
                     open: () => {
                         document.getElementById('main-menu').classList.add('hidden');
                         document.getElementById('modal-historico').classList.remove('hidden');
-                        App.controllers.crmFilter('todos'); // Carrega tabela
+                        App.controllers.crmFilter('recent'); // Carrega padrão (3 dias)
                     },
                     close: () => document.getElementById('modal-historico').classList.add('hidden')
                 },
@@ -948,6 +965,7 @@
                     });
 
                     // Aplica filtros
+                    if(type === 'recent') clients = clients.filter(c => c.daysSince <= 3);
                     if(type === 'vencendo') clients = clients.filter(c => c.couponExpiring);
                     if(type === 'inativo40') clients = clients.filter(c => c.daysSince > 40);
                     if(type === 'inativo60') clients = clients.filter(c => c.daysSince > 60);
@@ -960,6 +978,37 @@
                 },
                 renderCRMTable: (clients) => {
                     const tbody = document.getElementById('crm-table-body');
+                    
+                    // Atualizar Resumo
+                    let totalVal = 0;
+                    let totalCount = 0;
+                    let basketsCount = {};
+
+                    clients.forEach(c => {
+                        // Como estamos vendo clientes, podemos somar todas as ordens deles que estão no histórico ou apenas as recentes
+                        // A lógica aqui depende se queremos somar TUDO do cliente ou só o que está filtrado
+                        // Para simplicidade e consistência, somaremos o totalValue já calculado no crmFilter (que é o histórico total do cliente)
+                        // PORÉM, se o filtro for 'recent' (3 dias), talvez queiramos ver apenas vendas desses 3 dias? 
+                        // O crmFilter filtra CLIENTES que tiveram atividade.
+                        totalVal += c.totalValue; // Total gasto pelo cliente no histórico todo
+                        totalCount += c.orders.length; // Quantidade de pedidos no histórico
+
+                        c.orders.forEach(o => {
+                            o.cestas.forEach(b => {
+                                if(!basketsCount[b.nome]) basketsCount[b.nome] = 0;
+                                basketsCount[b.nome] += b.qtd;
+                            });
+                        });
+                    });
+
+                    document.getElementById('summary-count').innerText = totalCount;
+                    document.getElementById('summary-value').innerText = Utils.formatMoeda(totalVal);
+                    
+                    const basketStr = Object.entries(basketsCount)
+                        .map(([name, count]) => `<span class="whitespace-nowrap font-bold text-slate-200">${count}x ${name}</span>`)
+                        .join('<span class="mx-2 text-slate-600">|</span>');
+                    document.getElementById('summary-baskets').innerHTML = basketStr || 'Nenhuma venda';
+
                     if(clients.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400">Nenhum cliente encontrado com este filtro.</td></tr>'; return; }
                     
                     tbody.innerHTML = clients.map((c, idx) => {
@@ -996,8 +1045,11 @@
                                     <button onclick="App.controllers.avisarZap('${c.celular}', 'oferta')" class="w-full text-left px-4 py-3 hover:bg-blue-50 text-xs font-bold text-blue-700 border-b border-slate-100">
                                         🔥 Avisar Oferta
                                     </button>
-                                    <button onclick="App.controllers.avisarZap('${c.celular}', 'sorteio')" class="w-full text-left px-4 py-3 hover:bg-green-50 text-xs font-bold text-green-700">
+                                    <button onclick="App.controllers.avisarZap('${c.celular}', 'sorteio')" class="w-full text-left px-4 py-3 hover:bg-green-50 text-xs font-bold text-green-700 border-b border-slate-100">
                                         🍀 Avisar Sorteio
+                                    </button>
+                                    <button onclick="if(confirm('Tem certeza? Isso apagará TODO o histórico deste cliente.')) { Store.removeFromHistory('${c.nome}'); App.controllers.crmFilter('todos'); }" class="w-full text-left px-4 py-3 hover:bg-red-50 text-xs font-bold text-red-700">
+                                        🗑️ Excluir Histórico
                                     </button>
                                 </div>
                             </td>
