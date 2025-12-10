@@ -131,9 +131,10 @@
     <!-- Modal Lançamento -->
     <div id="modal-lancamento" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/60 modal-backdrop transition-opacity" onclick="App.ui.modalLancamento.close()"></div>
-        <div class="absolute bottom-0 md:top-10 md:bottom-auto md:left-1/2 md:-translate-x-1/2 w-full md:max-w-2xl bg-white md:rounded-xl rounded-t-2xl shadow-2xl h-[90vh] md:h-auto flex flex-col modal-content">
+        <!-- CORREÇÃO DE SCROLL E POSICIONAMENTO AQUI -->
+        <div class="absolute bottom-0 w-full h-[90vh] flex flex-col bg-white rounded-t-2xl shadow-2xl md:fixed md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl md:h-auto md:max-h-[90vh] md:rounded-xl modal-content">
             
-            <div class="flex justify-between items-center p-4 border-b">
+            <div class="flex-none flex justify-between items-center p-4 border-b">
                 <h3 class="text-lg font-bold text-gray-800">Nova Entrega</h3>
                 <button onclick="App.ui.modalLancamento.close()" class="text-gray-400 hover:text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
@@ -227,7 +228,7 @@
                 </div>
             </div>
 
-            <div class="p-4 border-t bg-gray-50 md:rounded-b-xl flex gap-3">
+            <div class="flex-none p-4 border-t bg-gray-50 md:rounded-b-xl flex gap-3">
                 <button onclick="App.ui.modalLancamento.close()" class="flex-1 py-3 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition-colors">Cancelar</button>
                 <button onclick="App.controllers.salvarEntrega()" class="flex-[2] py-3 bg-brand-600 text-white font-bold rounded-lg shadow-lg hover:bg-brand-700 transition-colors">Confirmar Lançamento</button>
             </div>
