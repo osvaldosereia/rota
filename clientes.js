@@ -7,6 +7,13 @@ const CLIENTES_DB = [
     "complemento": "Rua 14 quadra 20  casa 01 Jardim Dos Estados VG"
   },
   {
+  "id": "1765362154650-4ZOYM",
+  "nome": "Creusa Ortiz",
+  "celular": "65996328499",
+  "endereco": "Creusa Ortiz",
+  "complemento": "Rua João Paulo dos Santos \nQd 32\nCasa 03\nBairro Coophamil"
+},
+  {
   "id": "1763055285958-T9ZVD",
   "nome": "COX8440 AV TORRES",
   "celular": "65981478687",
