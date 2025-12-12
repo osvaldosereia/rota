@@ -7,6 +7,20 @@ const CLIENTES_DB = [
     "complemento": "Rua 14 quadra 20  casa 01 Jardim Dos Estados VG"
   },
   {
+  "id": "1765551517957-MNK1X",
+  "nome": "Tatiane Souza - Tijucal",
+  "celular": "992079393",
+  "endereco": "Tatiane Souza - Tijucal",
+  "complemento": "Rua 3, Quadra 3, Casa 40, Bairro São José, Anexo oficina JL Auto Center na rua da trânsito modas próximo as feiras de Goiânia"
+},
+  {
+  "id": "1765550475152-H7A28",
+  "nome": "Naely Bairro Tijucal",
+  "celular": "996085471",
+  "endereco": "Naely Tijucal",
+  "complemento": "Rua 209, Q54, C29a"
+},
+  {
   "id": "1765362652993-FUJKZ",
   "nome": "Moises Feltrin",
   "celular": "65 9972-7400",
