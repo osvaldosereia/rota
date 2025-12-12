@@ -7,6 +7,13 @@ const CLIENTES_DB = [
     "complemento": "Rua 14 quadra 20  casa 01 Jardim Dos Estados VG"
   },
   {
+  "id": "1765552558042-03SUB",
+  "nome": "COX5601 CINTURAO VERDE",
+  "celular": "992079393",
+  "endereco": "COX5601",
+  "complemento": "Linha 8 cinturao chacara 29 verde região do pedra 90"
+},
+  {
   "id": "1765551517957-MNK1X",
   "nome": "Tatiane Souza - Tijucal",
   "celular": "992079393",
